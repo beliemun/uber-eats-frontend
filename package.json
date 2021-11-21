@@ -2,6 +2,7 @@
   "name": "uber-eats-frontend",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "dependencies": {
     "@apollo/client": "^3.4.17",
     "@testing-library/jest-dom": "^5.11.4",
@@ -12,6 +13,7 @@
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "autoprefixer": "^10.4.0",
+    "global": "^4.4.0",
     "graphql": "^15.7.2",
     "postcss": "^8.3.11",
     "react": "^17.0.2",
@@ -24,6 +26,7 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
+    "apollo:codegen": "npx apollo client:codegen src/__generated__ --target=typescript --outputFlat",
     "tailwind:build": "tailwind build -i ./src/styles/tailwind.css -o ./src/styles/styles.css",
     "start": "npm run tailwind:build & react-scripts start",
     "build": "react-scripts build",

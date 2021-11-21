@@ -1,20 +1,46 @@
+import { gql, useMutation } from "@apollo/client";
 import React from "react";
 import { useForm } from "react-hook-form";
+import { FormError } from "../components/form-error";
+import {
+  loginMutation,
+  loginMutationVariables,
+} from "../__generated__/loginMutation";
+
+const LOGIN_MUTATION = gql`
+  mutation loginMutation($email: String!, $password: String!) {
+    login(input: { email: $email, password: $password }) {
+      ok
+      error
+      token
+    }
+  }
+`;
 
 interface ISignInForm {
   email: string;
   password: string;
 }
 
-export const SignInScreen = () => {
+export const SignInScreen: React.FC = () => {
   const {
     register,
     getValues,
     handleSubmit,
     formState: { errors },
   } = useForm<ISignInForm>();
+  const [loginMutation, { data }] = useMutation<
+    loginMutation,
+    loginMutationVariables
+  >(LOGIN_MUTATION);
   const onSubmit = () => {
-    console.log(getValues());
+    const { email, password } = getValues();
+    loginMutation({
+      variables: {
+        email,
+        password,
+      },
+    });
   };
   return (
     <div className="h-screen flex items-center justify-center bg-gray-800">
@@ -29,8 +55,8 @@ export const SignInScreen = () => {
             className="input"
             {...register("email", { required: "Email is required." })}
           />
-          {errors.email && (
-            <span className="text-red-600">{errors.email.message}</span>
+          {errors.email?.message && (
+            <FormError message={errors.email?.message} />
           )}
           <input
             type="password"
@@ -43,9 +69,7 @@ export const SignInScreen = () => {
             })}
           />
           {errors.password?.type === "minLength" && (
-            <span className="text-red-600">
-              Password should be longer than 6.
-            </span>
+            <FormError message={"Password should be longer than 6."} />
           )}
           <button className="bg-green-800 text-white px-4 py-3 mt-3 rounded-md hover:bg-green-500 transition-all duration-200">
             Login
