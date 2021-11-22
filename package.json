@@ -26,7 +26,7 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "apollo:codegen": "npx apollo client:codegen src/__generated__ --target=typescript --outputFlat",
+    "apollo:codegen": "rm -rf src/__generated__ npx && apollo client:codegen src/__generated__ --target=typescript --outputFlat",
     "tailwind:build": "tailwind build -i ./src/styles/tailwind.css -o ./src/styles/styles.css",
     "start": "npm run tailwind:build & react-scripts start",
     "build": "react-scripts build",
