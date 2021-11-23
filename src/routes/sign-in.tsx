@@ -1,5 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import React from "react";
+import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
 import { FormError } from "../components/form-error";
 import {
@@ -9,6 +10,8 @@ import {
 import uberLogo from "../images/uber-eats-logo.svg";
 import { Button } from "../components/button";
 import { Link } from "react-router-dom";
+import { authToken, isLoggedInVar } from "../apollo";
+import { LOCAL_STORAGE_TOKEN } from "../contstant";
 
 const LOGIN_MUTATION = gql`
   mutation loginMutation($loginInput: LoginInput!) {
@@ -35,7 +38,11 @@ export const SignInScreen: React.FC = () => {
     mode: "onChange",
   });
   const onCompleted = ({ login: { ok, error, token } }: loginMutation) => {
-    console.log(token);
+    if (ok && token) {
+      isLoggedInVar(true);
+      localStorage.setItem(LOCAL_STORAGE_TOKEN, token);
+      authToken(token);
+    }
   };
   const [loginMutation, { data: loginMutationResult, loading }] = useMutation<
     loginMutation,
@@ -58,6 +65,9 @@ export const SignInScreen: React.FC = () => {
   };
   return (
     <div className="h-screen flex flex-col items-center mt-10 lg:mt-32 mx-10">
+      <Helmet>
+        <title>Signin | Uber Eats</title>
+      </Helmet>
       {/* w-full, max-w 조합으로 반응형 디자인을 만들기 쉽다.  */}
       {/* 부모가 items-center를 가지고 있다면 자식중 하나가 width를 가지고 있어야 한다. */}
       <div className="w-full max-w-screen-sm flex flex-col items-center">
@@ -72,7 +82,13 @@ export const SignInScreen: React.FC = () => {
             required
             placeholder="Email"
             className="input"
-            {...register("email", { required: "Email is required." })}
+            {...register("email", {
+              required: "Email is required.",
+              pattern: {
+                value: /^[a-z0-9_+.-]+@([a-z0-9-]+\.)+[a-z0-9]{2,4}$/,
+                message: "It must be in email format.",
+              },
+            })}
           />
           {errors.email?.message && (
             <FormError message={errors.email?.message} />
@@ -90,7 +106,7 @@ export const SignInScreen: React.FC = () => {
           {errors.password?.type === "minLength" && (
             <FormError message={"Password should be longer than 4."} />
           )}
-          <Button text={"Login"} canClick={isValid} loading={loading} />
+          <Button text={"Sign in"} canClick={isValid} loading={loading} />
           {loginMutationResult?.login.error && (
             <FormError message={loginMutationResult?.login.error} />
           )}
