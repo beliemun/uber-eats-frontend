@@ -6,6 +6,9 @@ import {
   loginMutation,
   loginMutationVariables,
 } from "../__generated__/loginMutation";
+import uberLogo from "../images/uber-eats-logo.svg";
+import { Button } from "../components/button";
+import { Link } from "react-router-dom";
 
 const LOGIN_MUTATION = gql`
   mutation loginMutation($loginInput: LoginInput!) {
@@ -27,9 +30,10 @@ export const SignInScreen: React.FC = () => {
     register,
     getValues,
     handleSubmit,
-
-    formState: { errors },
-  } = useForm<ISignInForm>();
+    formState: { errors, isValid },
+  } = useForm<ISignInForm>({
+    mode: "onChange",
+  });
   const onCompleted = ({ login: { ok, error, token } }: loginMutation) => {
     console.log(token);
   };
@@ -53,41 +57,54 @@ export const SignInScreen: React.FC = () => {
     }
   };
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-800">
+    <div className="h-screen flex flex-col items-center mt-10 lg:mt-32 mx-10">
       {/* w-full, max-w 조합으로 반응형 디자인을 만들기 쉽다.  */}
-
-      <form onSubmit={handleSubmit(onSubmit)} className="grid gap-3 mt-5">
-        <input
-          type="email"
-          required
-          placeholder="Email"
-          className="input"
-          {...register("email", { required: "Email is required." })}
-        />
-        {errors.email?.message && <FormError message={errors.email?.message} />}
-        <input
-          type="password"
-          required
-          placeholder="Password"
-          className="input"
-          {...register("password", {
-            required: "Password is required.",
-            minLength: 4,
-          })}
-        />
-        {errors.password?.type === "minLength" && (
-          <FormError message={"Password should be longer than 4."} />
-        )}
-        <button
-          className="bg-green-800 text-white px-4 py-3 mt-3 rounded-md hover:bg-green-500 transition-all duration-200"
-          disabled={loading}
+      {/* 부모가 items-center를 가지고 있다면 자식중 하나가 width를 가지고 있어야 한다. */}
+      <div className="w-full max-w-screen-sm flex flex-col items-center">
+        <img src={uberLogo} alt="logo" className="w-48 mb-10" />
+        <h4 className="w-full text-left text-2xl font-medium">Welcome back</h4>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="grid gap-3 my-5 w-full"
         >
-          {loading ? "Loading..." : "Login"}
-        </button>
-        {loginMutationResult?.login.error && (
-          <FormError message={loginMutationResult?.login.error} />
-        )}
-      </form>
+          <input
+            type="email"
+            required
+            placeholder="Email"
+            className="input"
+            {...register("email", { required: "Email is required." })}
+          />
+          {errors.email?.message && (
+            <FormError message={errors.email?.message} />
+          )}
+          <input
+            type="password"
+            required
+            placeholder="Password"
+            className="input"
+            {...register("password", {
+              required: "Password is required.",
+              minLength: 4,
+            })}
+          />
+          {errors.password?.type === "minLength" && (
+            <FormError message={"Password should be longer than 4."} />
+          )}
+          <Button text={"Login"} canClick={isValid} loading={loading} />
+          {loginMutationResult?.login.error && (
+            <FormError message={loginMutationResult?.login.error} />
+          )}
+        </form>
+        <div>
+          <span className="text-sm">New to Uber? </span>
+          <Link
+            to="/sign-up"
+            className="text-sm font-medium text-rose-400 hover:underline"
+          >
+            Create a Account
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };
