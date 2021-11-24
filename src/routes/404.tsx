@@ -13,7 +13,7 @@ export const NotFound: React.FC = () => {
         The page you're looking for does not exist or has moved.
       </h4>
       <Link to="/">
-        <span className="text-sm hover:text-rose-400 hover:underline ">
+        <span className="text-sm text-rose-400 hover:underline ">
           Go back home &rarr;
         </span>
       </Link>

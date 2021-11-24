@@ -37,7 +37,7 @@ export const SignInScreen: React.FC = () => {
   } = useForm<ISignInForm>({
     mode: "onChange",
   });
-  const onCompleted = ({ login: { ok, error, token } }: loginMutation) => {
+  const onCompleted = ({ login: { ok, token } }: loginMutation) => {
     if (ok && token) {
       isLoggedInVar(true);
       localStorage.setItem(LOCAL_STORAGE_TOKEN, token);

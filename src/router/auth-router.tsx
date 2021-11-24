@@ -6,10 +6,14 @@ import { Loading } from "../components/loading";
 import { NotFound } from "../routes/404";
 import { Header } from "../components/header";
 import { useMe } from "../hooks/useMe";
+import { ConfirmEmail } from "../routes/user/confirm-email";
+import { EditProfile } from "../routes/user/edit-profile";
 
 const renderClientRoutes = () => (
   <>
     <Route path="/" element={<Restaurants />} />
+    <Route path="/confirm" element={<ConfirmEmail />} />
+    <Route path="/edit-profile" element={<EditProfile />} />
     <Route path="/*" element={<NotFound />} />
   </>
 );
