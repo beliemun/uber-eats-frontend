@@ -76,7 +76,7 @@ export const SignUpScreen: React.FC = () => {
   return (
     <div className="h-screen flex flex-col items-center mt-10 lg:mt-32 mx-10">
       <Helmet>
-        <title>Create Account | Uber Eats</title>
+        <title>Sign Up | Uber Eats</title>
       </Helmet>
       {/* w-full, max-w 조합으로 반응형 디자인을 만들기 쉽다.  */}
       {/* 부모가 items-center를 가지고 있다면 자식중 하나가 width를 가지고 있어야 한다. */}
