@@ -115,7 +115,7 @@ export const SignInScreen: React.FC = () => {
           <span className="text-sm">New to Uber? </span>
           <Link
             to="/sign-up"
-            className="text-sm font-medium text-rose-400 hover:underline"
+            className="text-sm font-medium text-green-400 hover:underline"
           >
             Create a Account
           </Link>
