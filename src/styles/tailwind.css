@@ -9,4 +9,8 @@
   @apply bg-green-400 text-white px-4 py-3 hover:bg-green-500 transition-colors;
 }
 
+.flex-center {
+  @apply flex justify-center items-center;
+}
+
 @tailwind utilities;

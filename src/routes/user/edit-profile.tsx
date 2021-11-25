@@ -11,8 +11,8 @@ import {
 import { Helmet } from "react-helmet-async";
 
 const EDIT_PROFILE_MUTATION = gql`
-  mutation editProfile($editProfileInput: EditProfileInput!) {
-    editProfile(input: $editProfileInput) {
+  mutation editProfile($input: EditProfileInput!) {
+    editProfile(input: $input) {
       ok
       error
     }
@@ -73,7 +73,7 @@ export const EditProfile: React.FC = () => {
     if (!loading) {
       editProfile({
         variables: {
-          editProfileInput: {
+          input: {
             email,
             ...(password !== "" && { password }),
           },

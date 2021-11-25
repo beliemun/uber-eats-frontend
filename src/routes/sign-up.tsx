@@ -14,8 +14,8 @@ import {
 import { useNavigate } from "react-router-dom";
 
 const CREATE_ACCOUNT_MUTATION = gql`
-  mutation createAccountMutation($createAccountInput: CreateAccountInput!) {
-    createAccount(input: $createAccountInput) {
+  mutation createAccountMutation($input: CreateAccountInput!) {
+    createAccount(input: $input) {
       ok
       error
     }
@@ -64,7 +64,7 @@ export const SignUpScreen: React.FC = () => {
       const { email, password, role } = getValues();
       createAccountMutation({
         variables: {
-          createAccountInput: {
+          input: {
             email,
             password,
             role,

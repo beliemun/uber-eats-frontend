@@ -14,8 +14,8 @@ import { authToken, isLoggedInVar } from "../apollo";
 import { LOCAL_STORAGE_TOKEN } from "../contstant";
 
 const LOGIN_MUTATION = gql`
-  mutation loginMutation($loginInput: LoginInput!) {
-    login(input: $loginInput) {
+  mutation loginMutation($input: LoginInput!) {
+    login(input: $input) {
       ok
       error
       token
@@ -55,7 +55,7 @@ export const SignInScreen: React.FC = () => {
     if (!loading) {
       loginMutation({
         variables: {
-          loginInput: {
+          input: {
             email,
             password,
           },

@@ -670,6 +670,12 @@ video {
   transition-duration: 150ms;
 }
 
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
