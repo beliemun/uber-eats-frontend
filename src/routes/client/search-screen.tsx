@@ -23,7 +23,7 @@ const SEARCH_RESTAURANT = gql`
   ${RESTAURANT_FRAGMENT}
 `;
 
-export const Search: React.FC = () => {
+export const SearchScreen: React.FC = () => {
   const [searchQuery, { data }] = useLazyQuery<
     searchRestaurant,
     searchRestaurantVariables
@@ -45,7 +45,7 @@ export const Search: React.FC = () => {
         },
       },
     });
-  }, [term]);
+  }, [navigate, searchQuery, term]);
 
   console.log(data);
 

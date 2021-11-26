@@ -1,6 +1,8 @@
 import { gql, useQuery } from "@apollo/client";
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
+import { Restaurants } from "../../components/restaurants";
+import { SearchBar } from "../../components/search-bar";
 import { CATEGORY_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragments";
 import { category, categoryVariables } from "../../__generated__/category";
 
@@ -27,7 +29,8 @@ type ICategoryParams = {
   slug: string;
 };
 
-export const Category: React.FC = () => {
+export const CategoryScreen: React.FC = () => {
+  const [page, setPage] = useState(1);
   const params = useParams() as ICategoryParams;
   const { data, loading } = useQuery<category, categoryVariables>(
     CATEGORY_QUERY,
@@ -35,7 +38,7 @@ export const Category: React.FC = () => {
       variables: {
         input: {
           slug: params.slug,
-          page: 1,
+          page,
         },
       },
     }
@@ -43,7 +46,21 @@ export const Category: React.FC = () => {
 
   return (
     <div>
-      <h1>Category</h1>
+      <SearchBar />
+      {!loading && (
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-xl text-gray-400 pt-5">{`Category: ${params.slug}`}</h2>
+          {data && (
+            <Restaurants
+              title={"Recommended Retaurants"}
+              restaurants={data.category.restaurants}
+              totalPages={data.category.totalPages}
+              page={page}
+              setPage={setPage}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 };

@@ -1,23 +1,23 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { UserRole } from "../__generated__/globalTypes";
-import { Restaurants } from "../routes/client/restaurants";
-import { Loading } from "../components/loading";
-import { NotFound } from "../routes/404";
-import { Header } from "../components/header";
 import { useMe } from "../hooks/useMe";
+import { UserRole } from "../__generated__/globalTypes";
+import { HomeScreen } from "../routes/client/home-screen";
+import { SearchScreen } from "../routes/client/search-screen";
+import { CategoryScreen } from "../routes/client/category-screen";
 import { ConfirmEmail } from "../routes/user/confirm-email";
 import { EditProfile } from "../routes/user/edit-profile";
-import { Search } from "../routes/client/search";
-import { Category } from "../routes/client/category";
+import { NotFound } from "../routes/404";
+import { Loading } from "../components/loading";
+import { Header } from "../components/header";
 
 const renderClientRoutes = () => (
   <>
-    <Route path="/" element={<Restaurants />} />
+    <Route path="/" element={<HomeScreen />} />
     <Route path="/confirm" element={<ConfirmEmail />} />
     <Route path="/edit-profile" element={<EditProfile />} />
-    <Route path="/search" element={<Search />} />
-    <Route path="/category/:slug" element={<Category />} />
+    <Route path="/search" element={<SearchScreen />} />
+    <Route path="/category/:slug" element={<CategoryScreen />} />
     <Route path="/*" element={<NotFound />} />
   </>
 );
