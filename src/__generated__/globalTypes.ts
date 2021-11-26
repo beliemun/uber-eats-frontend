@@ -29,6 +29,11 @@ export interface LoginInput {
   password: string;
 }
 
+export interface SearchRestaurantInput {
+  page?: number | null;
+  term: string;
+}
+
 export interface SeeRestaurantsInput {
   page?: number | null;
 }

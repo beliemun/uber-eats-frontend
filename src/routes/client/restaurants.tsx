@@ -7,6 +7,7 @@ import {
 import { Restaurant } from "../../components/restaurant";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { RESTAURANT_FRAGMENT } from "../../fragments";
 
 const SEE_RESTAURANT_QUERY = gql`
   query seeRetaurants($input: SeeRestaurantsInput!) {
@@ -27,17 +28,11 @@ const SEE_RESTAURANT_QUERY = gql`
       totalPages
       totalResults
       results {
-        id
-        name
-        coverImage
-        category {
-          name
-        }
-        address
-        isPromoted
+        ...RestaurantFragment
       }
     }
   }
+  ${RESTAURANT_FRAGMENT}
 `;
 
 interface ISearch {
@@ -71,10 +66,6 @@ export const Restaurants: React.FC = () => {
           placeholder="Search Restaurants..."
           {...register("term", {
             required: "Term is required.",
-            minLength: {
-              value: 4,
-              message: "Term words must be longer than 4.",
-            },
           })}
         />
       </form>
