@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 import {
   seeRetaurants,
   seeRetaurantsVariables,
 } from "../../__generated__/seeRetaurants";
+import { Restaurant } from "../../components/restaurant";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 const SEE_RESTAURANT_QUERY = gql`
   query seeRetaurants($input: SeeRestaurantsInput!) {
@@ -37,23 +40,47 @@ const SEE_RESTAURANT_QUERY = gql`
   }
 `;
 
+interface ISearch {
+  term: string;
+}
+
 export const Restaurants: React.FC = () => {
+  const navigate = useNavigate();
+  const [page, setPage] = useState(1);
   const { data, loading } = useQuery<seeRetaurants, seeRetaurantsVariables>(
     SEE_RESTAURANT_QUERY,
-    { variables: { input: { page: 1 } } }
+    { variables: { input: { page } } }
   );
-
+  const { register, getValues, handleSubmit } = useForm<ISearch>();
+  const onSearch = () => {
+    const { term } = getValues();
+    navigate({ pathname: "/search", search: `?term=${term}` });
+  };
+  const onNextPage = () => setPage(page + 1);
+  const onPrevPage = () => setPage(page - 1);
   return (
     <div>
-      <form className="bg-gray-800 w-full py-28 flex justify-center items-center">
+      <form
+        onSubmit={handleSubmit(onSearch)}
+        className="bg-gray-800 w-full py-8 sm:py-28 flex justify-center items-center"
+      >
         <input
-          className="input w-5/12 rounded-md"
+          className="input w-3/4 sm:w-7/12 rounded-md"
           type="search"
+          required
           placeholder="Search Restaurants..."
+          {...register("term", {
+            required: "Term is required.",
+            minLength: {
+              value: 4,
+              message: "Term words must be longer than 4.",
+            },
+          })}
         />
       </form>
       {!loading && (
-        <>
+        <div className="max-w-4xl mx-auto">
+          {/* categories */}
           <div className="flex p-6 mx-auto ">
             {data?.seeCategories.categories?.map((category, index) => (
               <div
@@ -68,22 +95,30 @@ export const Restaurants: React.FC = () => {
               </div>
             ))}
           </div>
-
+          {/* restaurants */}
           <h2 className="text-2xl font-bold p-3">Recommended Retaurants</h2>
-          <div className="grid grid-cols-3 gap-3">
-            {data?.seeRestaurants.results?.map((restaurant, index) => (
-              <div key={index} className="w-full mb-3">
-                {console.log(restaurant)}
-                <div
-                  className="py-20 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${restaurant.coverImage})` }}
-                ></div>
-                <h3>{restaurant.name}</h3>
-                <h4>{restaurant.category?.name}</h4>
-              </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {data?.seeRestaurants.results?.map((restaurant) => (
+              <Restaurant restaurant={restaurant} key={restaurant.id} />
             ))}
           </div>
-        </>
+          {/* pagination */}
+          <div className="flex-center pt-5 pb-10">
+            {page > 1 && (
+              <button onClick={onPrevPage} className="m-2">
+                &larr;
+              </button>
+            )}
+            <span className="text-sm">
+              {`Page ${page} of ${data?.seeRestaurants.totalPages}`}
+            </span>
+            {page !== data?.seeRestaurants.totalPages && (
+              <button onClick={onNextPage} className="m-2">
+                &rarr;
+              </button>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

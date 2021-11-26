@@ -8,12 +8,14 @@ import { Header } from "../components/header";
 import { useMe } from "../hooks/useMe";
 import { ConfirmEmail } from "../routes/user/confirm-email";
 import { EditProfile } from "../routes/user/edit-profile";
+import { Search } from "../routes/search";
 
 const renderClientRoutes = () => (
   <>
     <Route path="/" element={<Restaurants />} />
     <Route path="/confirm" element={<ConfirmEmail />} />
     <Route path="/edit-profile" element={<EditProfile />} />
+    <Route path="/search" element={<Search />} />
     <Route path="/*" element={<NotFound />} />
   </>
 );

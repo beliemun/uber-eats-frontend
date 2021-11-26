@@ -1,4 +1,5 @@
-const colors = require('tailwindcss/colors')
+const colors = require("tailwindcss/colors");
+const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
   purge: [],
@@ -6,12 +7,16 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        rose: colors.rose
-      }
+        rose: colors.rose,
+      },
+      screens: {
+        xs: "460px",
+        ...defaultTheme.screens,
+      },
     },
   },
   variants: {
     extend: {},
   },
   plugins: [],
-}
+};

@@ -32,13 +32,13 @@ export const Header: React.FC = () => {
       <header className="p-4">
         <div className="w-full max-w-4xl mx-auto flex justify-between items-center">
           <Link to="/">
-            <img src={uberLogo} alt="logo" className="w-40" />
+            <img src={uberLogo} alt="logo" className="w-28 sm:w-40" />
           </Link>
           <div className="text-sm">
             <span className="text-green-500 hover:underline">
               <Link to="/edit-profile">
                 <FontAwesomeIcon icon={faUser} className="text-sm mr-1" />
-                {data?.me.email}
+                <span className="hidden sm:inline">{data?.me.email}</span>
               </Link>
             </span>
             <span className="text-gray-300"> | </span>
