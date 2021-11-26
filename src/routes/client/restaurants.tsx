@@ -7,7 +7,8 @@ import {
 import { Restaurant } from "../../components/restaurant";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { RESTAURANT_FRAGMENT } from "../../fragments";
+import { CATEGORY_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragments";
+import { Link } from "react-router-dom";
 
 const SEE_RESTAURANT_QUERY = gql`
   query seeRetaurants($input: SeeRestaurantsInput!) {
@@ -15,11 +16,7 @@ const SEE_RESTAURANT_QUERY = gql`
       ok
       error
       categories {
-        id
-        name
-        coverImage
-        slug
-        restaurantCount
+        ...CategoryFragment
       }
     }
     seeRestaurants(input: $input) {
@@ -33,6 +30,7 @@ const SEE_RESTAURANT_QUERY = gql`
     }
   }
   ${RESTAURANT_FRAGMENT}
+  ${CATEGORY_FRAGMENT}
 `;
 
 interface ISearch {
@@ -73,17 +71,16 @@ export const Restaurants: React.FC = () => {
         <div className="max-w-4xl mx-auto">
           {/* categories */}
           <div className="flex p-6 mx-auto ">
-            {data?.seeCategories.categories?.map((category, index) => (
-              <div
-                key={index}
-                className="group flex-center flex-col cursor-pointer mr-4"
-              >
-                <div
-                  className="w-16 h-16 bg-cover rounded-full border-4 border-gray-200 group-hover:border-green-500"
-                  style={{ backgroundImage: `url(${category.coverImage})` }}
-                />
-                <span className="text-sm mt-2">{category.name}</span>
-              </div>
+            {data?.seeCategories.categories?.map((category) => (
+              <Link to={`/category/${category.slug}`} key={category.id}>
+                <div className="group flex-center flex-col cursor-pointer mr-4">
+                  <div
+                    className="w-16 h-16 bg-cover rounded-full border-4 border-gray-200 group-hover:border-green-500"
+                    style={{ backgroundImage: `url(${category.coverImage})` }}
+                  />
+                  <span className="text-sm mt-2">{category.name}</span>
+                </div>
+              </Link>
             ))}
           </div>
           {/* restaurants */}

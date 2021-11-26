@@ -2,11 +2,11 @@ import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { Helmet } from "react-helmet-async";
 import { gql, useLazyQuery } from "@apollo/client";
-import { RESTAURANT_FRAGMENT } from "../fragments";
+import { RESTAURANT_FRAGMENT } from "../../fragments";
 import {
   searchRestaurant,
   searchRestaurantVariables,
-} from "../__generated__/searchRestaurant";
+} from "../../__generated__/searchRestaurant";
 
 const SEARCH_RESTAURANT = gql`
   query searchRestaurant($input: SearchRestaurantInput!) {
@@ -24,7 +24,7 @@ const SEARCH_RESTAURANT = gql`
 `;
 
 export const Search: React.FC = () => {
-  const [searchQuery, { data, loading }] = useLazyQuery<
+  const [searchQuery, { data }] = useLazyQuery<
     searchRestaurant,
     searchRestaurantVariables
   >(SEARCH_RESTAURANT);
