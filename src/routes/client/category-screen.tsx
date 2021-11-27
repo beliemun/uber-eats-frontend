@@ -1,7 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { RestaurantList } from "../../components/restaurant-list";
+import { Restaurants } from "../../components/restaurants";
 import { SearchBar } from "../../components/search-bar";
 import { CATEGORY_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragments";
 import { category, categoryVariables } from "../../__generated__/category";
@@ -51,7 +51,7 @@ export const CategoryScreen: React.FC = () => {
         <div className="max-w-4xl mx-auto">
           <h2 className="text-xl text-gray-400 pt-5">{`Category: ${params.slug}`}</h2>
           {data && (
-            <RestaurantList
+            <Restaurants
               title={"Recommended Retaurants"}
               restaurants={data.category.restaurants}
               totalPages={data.category.totalPages}

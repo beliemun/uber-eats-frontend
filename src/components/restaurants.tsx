@@ -1,6 +1,6 @@
 import React from "react";
 import { seeRetaurants_seeRestaurants_results } from "../__generated__/seeRetaurants";
-import { RestaurantItem } from "./restaurant-item";
+import { Restaurant } from "./restaurant";
 
 interface IRestaurantsProps {
   title: string;
@@ -10,7 +10,7 @@ interface IRestaurantsProps {
   setPage: (value: React.SetStateAction<number>) => void;
 }
 
-export const RestaurantList: React.FC<IRestaurantsProps> = ({
+export const Restaurants: React.FC<IRestaurantsProps> = ({
   title,
   restaurants,
   totalPages,
@@ -24,7 +24,7 @@ export const RestaurantList: React.FC<IRestaurantsProps> = ({
       <h2 className="text-2xl font-bold py-3">{title}</h2>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         {restaurants?.map((restaurant) => (
-          <RestaurantItem restaurant={restaurant} key={restaurant.id} />
+          <Restaurant restaurant={restaurant} key={restaurant.id} />
         ))}
       </div>
       {/* pagination */}

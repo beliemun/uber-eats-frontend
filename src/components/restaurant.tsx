@@ -6,7 +6,7 @@ interface IRestaurantProps {
   restaurant: seeRetaurants_seeRestaurants_results;
 }
 
-export const RestaurantItem: React.FC<IRestaurantProps> = ({ restaurant }) => {
+export const Restaurant: React.FC<IRestaurantProps> = ({ restaurant }) => {
   return (
     <Link to={`/restaurant/${restaurant.id}`}>
       <div className="w-full mb-3">
