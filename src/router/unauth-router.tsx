@@ -4,7 +4,7 @@ import { NotFound } from "../routes/404";
 import { SignInScreen } from "../routes/sign-in";
 import { SignUpScreen } from "../routes/sign-up";
 
-export const LoggedOutRouter: React.FC = () => {
+export const UnAuthRouter: React.FC = () => {
   return (
     <Router>
       <Routes>

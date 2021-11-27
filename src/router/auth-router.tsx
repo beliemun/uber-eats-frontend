@@ -24,7 +24,7 @@ const renderClientRoutes = () => (
   </>
 );
 
-export const LoggedInRouter: React.FC = () => {
+export const AuthRouter: React.FC = () => {
   const { data, loading, error } = useMe();
 
   return !data || loading || error ? (
