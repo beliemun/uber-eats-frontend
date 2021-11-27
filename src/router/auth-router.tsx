@@ -10,6 +10,7 @@ import { EditProfile } from "../routes/user/edit-profile";
 import { NotFound } from "../routes/404";
 import { Loading } from "../components/loading";
 import { Header } from "../components/header";
+import { RestaurantScreen } from "../routes/client/restaurant-screen";
 
 const renderClientRoutes = () => (
   <>
@@ -18,6 +19,7 @@ const renderClientRoutes = () => (
     <Route path="/edit-profile" element={<EditProfile />} />
     <Route path="/search" element={<SearchScreen />} />
     <Route path="/category/:slug" element={<CategoryScreen />} />
+    <Route path="/restaurant/:id" element={<RestaurantScreen />} />
     <Route path="/*" element={<NotFound />} />
   </>
 );

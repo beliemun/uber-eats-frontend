@@ -5,7 +5,7 @@ import {
   seeRetaurantsVariables,
 } from "../../__generated__/seeRetaurants";
 import { CATEGORY_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragments";
-import { Restaurants } from "../../components/restaurants";
+import { RestaurantList } from "../../components/restaurant-list";
 import { Categories } from "../../components/cotegories";
 import { SearchBar } from "../../components/search-bar";
 
@@ -45,7 +45,7 @@ export const HomeScreen: React.FC = () => {
       {!loading && data && (
         <div className="max-w-4xl mx-auto">
           <Categories seeCategories={data.seeCategories} />
-          <Restaurants
+          <RestaurantList
             title={"Recommended Retaurants"}
             restaurants={data.seeRestaurants.results}
             totalPages={data.seeRestaurants.totalPages}
