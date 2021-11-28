@@ -33,7 +33,6 @@ export const RestaurantScreen: React.FC = () => {
       },
     },
   });
-  console.log(data);
   return (
     <div>
       <div

@@ -38,7 +38,6 @@ describe("<SignInScreen />", () => {
     await waitFor(() => {
       userEvent.type(password, "123");
     });
-    debug();
     getByText("• Password should be longer than 4.");
   });
 });

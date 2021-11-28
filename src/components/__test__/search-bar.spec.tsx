@@ -4,10 +4,11 @@ import { BrowserRouter as Router } from "react-router-dom";
 
 describe("<SearchBar />", () => {
   it("should render well", () => {
-    render(
+    const { getByPlaceholderText } = render(
       <Router>
         <SearchBar />
       </Router>
     );
+    getByPlaceholderText("Search Restaurants...");
   });
 });
