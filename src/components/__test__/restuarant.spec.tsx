@@ -22,12 +22,11 @@ describe("<Restaurant />", () => {
   };
 
   it("render with props", () => {
-    const { debug, getByText, container } = render(
+    const { getByText, container } = render(
       <Router>
         <Restaurant restaurant={restaurant} />
       </Router>
     );
-    debug();
     getByText("testRestaurant");
     getByText("testCategory");
     expect(container.firstChild).toHaveAttribute(

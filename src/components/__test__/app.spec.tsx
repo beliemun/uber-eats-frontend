@@ -2,12 +2,12 @@ import { render, waitFor } from "@testing-library/react";
 import { isLoggedInVar } from "../../apollo";
 import App from "../app";
 
-jest.mock("../../router/unauth-router", () => {
+jest.mock("../../routers/unauth-router", () => {
   return {
     UnAuthRouter: () => <span>Logged out</span>,
   };
 });
-jest.mock("../../router/auth-router", () => {
+jest.mock("../../routers/auth-router", () => {
   return {
     AuthRouter: () => <span>Logged in</span>,
   };
