@@ -1,16 +1,17 @@
 import { ApolloProvider } from "@apollo/client";
 import { render, RenderResult, waitFor } from "@testing-library/react";
 import { BrowserRouter as Router } from "react-router-dom";
-import { createMockClient } from "mock-apollo-client";
+import { createMockClient, MockApolloClient } from "mock-apollo-client";
 import { HelmetProvider } from "react-helmet-async";
-import { SignInScreen } from "../sign-in";
+import { LOGIN_MUTATION, SignInScreen } from "../sign-in";
 import userEvent from "@testing-library/user-event";
 
 describe("<SignInScreen />", () => {
   let renderResult: RenderResult;
+  let mockedClient: MockApolloClient;
   beforeEach(async () => {
     await waitFor(() => {
-      const mockedClient = createMockClient();
+      mockedClient = createMockClient();
       renderResult = render(
         <ApolloProvider client={mockedClient}>
           <HelmetProvider>
@@ -22,23 +23,54 @@ describe("<SignInScreen />", () => {
       );
     });
   });
+
   it("should render well", async () => {
     await waitFor(() => {
       expect(document.title).toBe("Sign In | Uber Eats");
     });
   });
+
   it("display email validation error", async () => {
-    const { getByPlaceholderText, debug, getByText } = renderResult;
-    const email = getByPlaceholderText("Email");
-    const password = getByPlaceholderText("Password");
+    const { getByPlaceholderText, getByText } = renderResult;
+    const emailInput = getByPlaceholderText("Email");
     await waitFor(() => {
-      userEvent.type(email, "test@test");
+      userEvent.type(emailInput, "test@test");
     });
     getByText("• It must be in email format.");
-    await waitFor(() => {
-      userEvent.type(password, "123");
+  });
+
+  it("submit form and calls mutation", async () => {
+    const formData = {
+      email: "test@test.com",
+      password: "1234",
+    };
+    const { getByPlaceholderText, getByText, debug } = renderResult;
+    const emailInput = getByPlaceholderText("Email");
+    const passwordInput = getByPlaceholderText("Password");
+    const submitButton = getByText("Sign in");
+    console.log(emailInput.innerHTML);
+
+    const mockedMutationResponse = jest.fn().mockResolvedValue({
+      data: {
+        login: {
+          ok: true,
+          error: "test-error", // 실제로 ok:true에서 error가 존재하지 않지만 코드를 복사하지 않기 위해 이렇게 작성함.
+          token: "test-token",
+        },
+      },
     });
-    getByText("• Password should be longer than 4.");
+
+    jest.spyOn(Storage.prototype, "setItem");
+    mockedClient.setRequestHandler(LOGIN_MUTATION, mockedMutationResponse);
+    await waitFor(() => {
+      userEvent.type(emailInput, formData.email);
+      userEvent.type(passwordInput, formData.password);
+      userEvent.click(submitButton);
+    });
+    expect(mockedMutationResponse).toHaveBeenCalledTimes(1);
+    expect(mockedMutationResponse).toHaveBeenCalledWith({ input: formData });
+    getByText("• test-error");
+    expect(localStorage.setItem).toHaveBeenCalledWith("token", "test-token");
   });
 });
 

@@ -47,6 +47,8 @@ export const SearchScreen: React.FC = () => {
     });
   }, [navigate, searchQuery, term]);
 
+  console.log(data);
+
   return (
     <div>
       <Helmet>
