@@ -6,6 +6,16 @@ import { render } from "../../test-utils";
 import { UserRole } from "../../__generated__/globalTypes";
 import { CREATE_ACCOUNT_MUTATION, SignUpScreen } from "../sign-up";
 
+const mockNavigate = jest.fn();
+
+jest.mock("react-router-dom", () => {
+  const realModule = jest.requireActual("react-router-dom");
+  return {
+    ...realModule,
+    useNavigate: () => mockNavigate,
+  };
+});
+
 describe("<SignUpScreen />", () => {
   let mockedClient = createMockClient();
   let rederResult: RenderResult;
@@ -85,6 +95,11 @@ describe("<SignUpScreen />", () => {
       input: formData,
     });
     getByText("• test-error");
+    expect(mockNavigate).toHaveBeenCalledWith("/");
     expect(window.alert).toHaveBeenCalledWith("Account Created. Sign in now!");
+  });
+
+  afterAll(() => {
+    jest.clearAllMocks();
   });
 });
