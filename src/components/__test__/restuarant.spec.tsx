@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { render } from "../../test-utils";
 import {
   seeRetaurants_seeRestaurants_results,
   seeRetaurants_seeRestaurants_results_category,
@@ -23,9 +23,7 @@ describe("<Restaurant />", () => {
 
   it("render with props", () => {
     const { getByText, container } = render(
-      <Router>
-        <Restaurant restaurant={restaurant} />
-      </Router>
+      <Restaurant restaurant={restaurant} />
     );
     getByText("testRestaurant");
     getByText("testCategory");

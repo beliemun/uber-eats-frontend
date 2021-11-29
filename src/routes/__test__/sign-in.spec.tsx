@@ -1,12 +1,12 @@
 import { ApolloProvider } from "@apollo/client";
-import { render, RenderResult, waitFor } from "../../test-utils";
 import { createMockClient, MockApolloClient } from "mock-apollo-client";
 import { LOGIN_MUTATION, SignInScreen } from "../sign-in";
+import { render, waitFor, RenderResult } from "../../test-utils";
 import userEvent from "@testing-library/user-event";
 
 describe("<SignInScreen />", () => {
-  let renderResult: RenderResult;
   let mockedClient: MockApolloClient;
+  let renderResult: RenderResult;
   beforeEach(async () => {
     await waitFor(() => {
       mockedClient = createMockClient();
@@ -42,8 +42,6 @@ describe("<SignInScreen />", () => {
     const emailInput = getByPlaceholderText("Email");
     const passwordInput = getByPlaceholderText("Password");
     const submitButton = getByText("Sign in");
-    console.log(emailInput.innerHTML);
-
     const mockedMutationResponse = jest.fn().mockResolvedValue({
       data: {
         login: {

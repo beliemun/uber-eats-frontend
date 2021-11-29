@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { render } from "../../test-utils";
 import {
   seeRetaurants_seeCategories,
   seeRetaurants_seeCategories_categories,
@@ -22,11 +22,7 @@ describe("<Categories />", () => {
       error: null,
       categories: [category],
     };
-    const { getByText } = render(
-      <Router>
-        <Categories seeCategories={categories} />
-      </Router>
-    );
+    const { getByText } = render(<Categories seeCategories={categories} />);
     getByText(category.name);
   });
 });

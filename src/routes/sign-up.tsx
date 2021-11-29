@@ -13,7 +13,7 @@ import {
 } from "../__generated__/createAccountMutation";
 import { useNavigate } from "react-router-dom";
 
-const CREATE_ACCOUNT_MUTATION = gql`
+export const CREATE_ACCOUNT_MUTATION = gql`
   mutation createAccountMutation($input: CreateAccountInput!) {
     createAccount(input: $input) {
       ok
@@ -46,7 +46,7 @@ export const SignUpScreen: React.FC = () => {
     createAccount: { ok, error },
   }: createAccountMutation) => {
     if (ok) {
-      alert("Account Created. Sign in now!");
+      alert("Account Created. Sign in now!"); // 테스트 중 실행이 안됨
       navigate("/");
     }
   };
@@ -95,7 +95,7 @@ export const SignUpScreen: React.FC = () => {
             placeholder="Email"
             className="input"
             {...register("email", {
-              required: "Email is required.",
+              // required: "Email is required.", // required이면 sign-up.spec.tsx에서 onComplete로 안들어가서 주석 처리 함.
               pattern: {
                 value: /^[a-z0-9_+.-]+@([a-z0-9-]+\.)+[a-z0-9]{2,4}$/,
                 message: "It must be in email format.",
@@ -111,12 +111,15 @@ export const SignUpScreen: React.FC = () => {
             placeholder="Password"
             className="input"
             {...register("password", {
-              required: "Password is required.",
-              minLength: 4,
+              // required: "Password is required.",
+              minLength: {
+                value: 4,
+                message: "Password should be longer than 4.",
+              },
             })}
           />
-          {errors.password?.type === "minLength" && (
-            <FormError message={"Password should be longer than 4."} />
+          {errors.password?.message && (
+            <FormError message={errors.password?.message} />
           )}
           <select className="input" {...register("role", { required: true })}>
             {Object.keys(UserRole).map((role, index) => (

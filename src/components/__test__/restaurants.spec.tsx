@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { render } from "../../test-utils";
 import {
   seeRetaurants_seeRestaurants_results,
   seeRetaurants_seeRestaurants_results_category,
@@ -28,25 +28,17 @@ describe("<Restaurants />", () => {
     setPage: jest.fn(),
   };
   it("should render well", () => {
-    render(
-      <Router>
-        <Restaurants {...restaurantsProps} />
-      </Router>
-    );
+    render(<Restaurants {...restaurantsProps} />);
   });
   it("should render a prev button if page value is higher than 1.", () => {
     const { getByText } = render(
-      <Router>
-        <Restaurants {...restaurantsProps} page={2} />
-      </Router>
+      <Restaurants {...restaurantsProps} page={2} />
     );
     getByText("←");
   });
   it("should render a next arrow if page is not equal with totalPages", () => {
     const { getByText } = render(
-      <Router>
-        <Restaurants {...restaurantsProps} page={1} totalPages={2} />
-      </Router>
+      <Restaurants {...restaurantsProps} page={1} totalPages={2} />
     );
     getByText("→");
   });

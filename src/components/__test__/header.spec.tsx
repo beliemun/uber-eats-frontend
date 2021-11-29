@@ -1,11 +1,8 @@
 import { MockedProvider } from "@apollo/client/testing";
-import { BrowserRouter as Router } from "react-router-dom";
-import { render, RenderResult, waitFor } from "@testing-library/react";
+import { render, RenderResult, waitFor } from "../../test-utils";
 import { Header } from "../header";
 import { ME_QUERY } from "../../hooks/useMe";
 import userEvent from "@testing-library/user-event";
-import { isLoggedInVar } from "../../apollo";
-import { useReactiveVar } from "@apollo/client";
 
 // MockedProvider : apollo에서 제공하는 테스트 도구를 사용. useQuery 혹은 useMutation을 통과할 수 있음.
 // hook 자체를 mock하면 안되고, hook의 결과에 영향을 줄 수 있도록 mock을 해야 한다.
@@ -34,9 +31,7 @@ describe("<Header />", () => {
             },
           ]}
         >
-          <Router>
-            <Header />
-          </Router>
+          <Header />
         </MockedProvider>
       );
     });
