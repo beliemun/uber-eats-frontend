@@ -63,6 +63,7 @@ describe("<SignInScreen />", () => {
     expect(mockedMutationResponse).toHaveBeenCalledWith({ input: formData });
     getByText("• test-error");
     expect(localStorage.setItem).toHaveBeenCalledWith("token", "test-token");
+    debug();
   });
 });
 

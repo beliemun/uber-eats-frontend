@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { useMe } from "../hooks/useMe";
 import { UserRole } from "../__generated__/globalTypes";
 import { HomeScreen } from "../routes/client/home-screen";
@@ -24,18 +24,18 @@ const renderClientRoutes = () => (
   </>
 );
 
-export const AuthRouter: React.FC = () => {
+export const Auth: React.FC = () => {
   const { data, loading, error } = useMe();
 
   return !data || loading || error ? (
     <Loading />
   ) : (
-    <Router>
+    <>
       {/* Header 안에서 Link를 사용할 것이고 Link는 반드시 Router안 위치해야 한다. */}
       <Header />
       <Routes>
         {data?.me.role === UserRole.Client && renderClientRoutes()}
       </Routes>
-    </Router>
+    </>
   );
 };

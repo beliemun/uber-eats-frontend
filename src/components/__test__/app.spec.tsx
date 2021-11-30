@@ -1,26 +1,26 @@
-import { render, waitFor } from "@testing-library/react";
+import { render, waitFor } from "../../test-utils";
 import { isLoggedInVar } from "../../apollo";
 import App from "../app";
 
-jest.mock("../../routers/unauth-router", () => {
+jest.mock("../../routers/un-auth", () => {
   return {
-    UnAuthRouter: () => <span>Logged out</span>,
+    UnAuth: () => <span>Logged out</span>,
   };
 });
-jest.mock("../../routers/auth-router", () => {
+jest.mock("../../routers/auth", () => {
   return {
-    AuthRouter: () => <span>Logged in</span>,
+    Auth: () => <span>Logged in</span>,
   };
 });
 
 describe("<App />", () => {
   //individual test
-  it("render UnAuthRouter", () => {
+  it("render UnAuth", () => {
     const { getByText } = render(<App />);
     getByText("Logged out");
   });
 
-  it("render AuthRouter", async () => {
+  it("render Auth", async () => {
     const { getByText } = render(<App />);
     await waitFor(() => {
       isLoggedInVar(true);

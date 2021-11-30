@@ -6,12 +6,15 @@ import "./styles/styles.css";
 import { ApolloProvider } from "@apollo/client";
 import { client } from "./apollo";
 import { HelmetProvider } from "react-helmet-async";
+import { BrowserRouter as Router } from "react-router-dom";
 
 ReactDOM.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
       <HelmetProvider>
-        <App />
+        <Router>
+          <App />
+        </Router>
       </HelmetProvider>
     </ApolloProvider>
   </React.StrictMode>,

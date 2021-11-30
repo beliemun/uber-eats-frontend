@@ -3,6 +3,7 @@ import { render, RenderResult, waitFor } from "../../test-utils";
 import { Header } from "../header";
 import { ME_QUERY } from "../../hooks/useMe";
 import userEvent from "@testing-library/user-event";
+import { UserRole } from "../../__generated__/globalTypes";
 
 // MockedProvider : apollo에서 제공하는 테스트 도구를 사용. useQuery 혹은 useMutation을 통과할 수 있음.
 // hook 자체를 mock하면 안되고, hook의 결과에 영향을 줄 수 있도록 mock을 해야 한다.
@@ -22,8 +23,8 @@ describe("<Header />", () => {
                 data: {
                   me: {
                     id: 1,
-                    email: "testEmail",
-                    role: "testClient",
+                    email: "test@test.com",
+                    role: UserRole.Client,
                     verified: false,
                   },
                 },
@@ -48,7 +49,7 @@ describe("<Header />", () => {
   it("should render without verify banner", async () => {
     await waitFor(async () => {
       const { queryByText } = renderResult;
-      await new Promise((resolve) => setTimeout(resolve, 5));
+      await new Promise((resolve) => setTimeout(resolve, 0));
       // getByText()는 대상을 찾지 못하면 바로 Fail을 리턴.
       // queryByText()는 찾지 못할 경우 null을 리턴.
       expect(queryByText("Please verify your email")).toBeNull;

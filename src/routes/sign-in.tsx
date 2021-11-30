@@ -46,6 +46,7 @@ export const SignInScreen: React.FC = () => {
       isLoggedInVar(true);
       localStorage.setItem(LOCAL_STORAGE_TOKEN, token);
       authToken(token);
+      console.log("### saved:", token);
     }
   };
   const [loginMutation, { data: loginMutationResult, loading }] = useMutation<

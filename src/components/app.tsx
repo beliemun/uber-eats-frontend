@@ -1,12 +1,12 @@
 import React from "react";
 import { useReactiveVar } from "@apollo/client";
 import { isLoggedInVar } from "../apollo";
-import { AuthRouter } from "../routers/auth-router";
-import { UnAuthRouter } from "../routers/unauth-router";
+import { Auth } from "../routers/auth";
+import { UnAuth } from "../routers/un-auth";
 
 export const App: React.FC = () => {
   const isLoggedIn = useReactiveVar(isLoggedInVar);
-  return isLoggedIn ? <AuthRouter /> : <UnAuthRouter />;
+  return isLoggedIn ? <Auth /> : <UnAuth />;
 };
 
 export default App;
