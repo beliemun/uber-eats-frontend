@@ -63,7 +63,7 @@ describe("<SignUpScreen />", () => {
   });
 
   it("submits mutations with form values", async () => {
-    const { getByRole, getByPlaceholderText, getByText, debug } = rederResult;
+    const { getByRole, getByPlaceholderText, getByText } = rederResult;
     const emailInput = getByPlaceholderText("Email");
     const passwordInput = getByPlaceholderText("Password");
     const submitButton = getByRole("button");

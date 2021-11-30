@@ -4,7 +4,6 @@ import {
   seeRetaurants_seeCategories_categories,
 } from "../../__generated__/seeRetaurants";
 import { Categories } from "../cotegories";
-import { BrowserRouter as Router } from "react-router-dom";
 
 describe("<Categories />", () => {
   it("should render well with props", () => {

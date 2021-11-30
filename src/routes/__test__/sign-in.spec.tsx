@@ -7,6 +7,10 @@ import userEvent from "@testing-library/user-event";
 describe("<SignInScreen />", () => {
   let mockedClient: MockApolloClient;
   let renderResult: RenderResult;
+  const formData = {
+    email: "test@test.com",
+    password: "1234",
+  };
   beforeEach(async () => {
     await waitFor(() => {
       mockedClient = createMockClient();
@@ -34,11 +38,7 @@ describe("<SignInScreen />", () => {
   });
 
   it("submit form and calls mutation", async () => {
-    const formData = {
-      email: "test@test.com",
-      password: "1234",
-    };
-    const { getByPlaceholderText, getByText, debug } = renderResult;
+    const { getByPlaceholderText, getByText } = renderResult;
     const emailInput = getByPlaceholderText("Email");
     const passwordInput = getByPlaceholderText("Password");
     const submitButton = getByText("Sign in");
@@ -46,7 +46,7 @@ describe("<SignInScreen />", () => {
       data: {
         login: {
           ok: true,
-          error: "test-error", // 실제로 ok:true에서 error가 존재하지 않지만 코드를 복사하지 않기 위해 이렇게 작성함.
+          error: "test-error",
           token: "test-token",
         },
       },
@@ -61,9 +61,8 @@ describe("<SignInScreen />", () => {
     });
     expect(mockedMutationResponse).toHaveBeenCalledTimes(1);
     expect(mockedMutationResponse).toHaveBeenCalledWith({ input: formData });
-    getByText("• test-error");
     expect(localStorage.setItem).toHaveBeenCalledWith("token", "test-token");
-    debug();
+    getByText("• test-error");
   });
 });
 

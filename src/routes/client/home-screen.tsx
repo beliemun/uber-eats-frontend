@@ -9,7 +9,7 @@ import { Restaurants } from "../../components/restaurants";
 import { Categories } from "../../components/cotegories";
 import { SearchBar } from "../../components/search-bar";
 
-const SEE_RESTAURANT_QUERY = gql`
+export const SEE_RESTAURANT_QUERY = gql`
   query seeRetaurants($input: SeeRestaurantsInput!) {
     seeCategories {
       ok
@@ -36,7 +36,9 @@ export const HomeScreen: React.FC = () => {
   const [page, setPage] = useState(1);
   const { data, loading } = useQuery<seeRetaurants, seeRetaurantsVariables>(
     SEE_RESTAURANT_QUERY,
-    { variables: { input: { page } } }
+    {
+      variables: { input: { page } },
+    }
   );
 
   return (
