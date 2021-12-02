@@ -24,10 +24,13 @@ const SEARCH_RESTAURANT = gql`
 `;
 
 export const SearchScreen: React.FC = () => {
-  const [searchQuery, { data }] = useLazyQuery<
+  const onCompleted = (data: searchRestaurant) => {
+    console.log(data);
+  };
+  const [searchQuery] = useLazyQuery<
     searchRestaurant,
     searchRestaurantVariables
-  >(SEARCH_RESTAURANT);
+  >(SEARCH_RESTAURANT, { onCompleted });
 
   const navigate = useNavigate();
   const location = useLocation();

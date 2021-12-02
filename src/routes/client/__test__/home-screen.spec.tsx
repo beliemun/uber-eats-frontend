@@ -30,7 +30,7 @@ describe("<HomeScreen />", () => {
     name: "testRestaurant",
   };
 
-  beforeEach(async () => {
+  beforeEach(() => {
     renderResult = render(
       <MockedProvider
         mocks={[

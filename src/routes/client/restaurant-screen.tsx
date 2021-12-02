@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useParams } from "react-router";
 import { RESTAURANT_FRAGMENT } from "../../fragments";
 import {
@@ -7,7 +7,7 @@ import {
   restaurantVariables,
 } from "../../__generated__/restaurant";
 
-const RESTAURANT_QEURY = gql`
+export const RESTAURANT_QEURY = gql`
   query restaurant($input: RestaurantInput!) {
     restaurant(input: $input) {
       ok
@@ -33,6 +33,11 @@ export const RestaurantScreen: React.FC = () => {
       },
     },
   });
+
+  useEffect(() => {
+    console.log("data:", data);
+  }, [data]);
+
   return (
     <div>
       <div
