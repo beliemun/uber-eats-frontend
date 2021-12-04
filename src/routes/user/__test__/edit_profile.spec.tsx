@@ -1,10 +1,12 @@
 import { ApolloProvider } from "@apollo/client";
-import { createMockClient } from "mock-apollo-client";
+import { MockedProvider } from "@apollo/client/testing";
 import { RenderResult, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { render } from "../../test-utils";
-import { UserRole } from "../../__generated__/globalTypes";
-import { CREATE_ACCOUNT_MUTATION, SignUpScreen } from "../sign-up";
+import { createMockClient } from "mock-apollo-client";
+import { ME_QUERY } from "../../../hooks/useMe";
+import { render } from "../../../test-utils";
+import { UserRole } from "../../../__generated__/globalTypes";
+import { EditProfile, EDIT_PROFILE_MUTATION } from "../edit-profile";
 
 const mockNavigate = jest.fn();
 
@@ -16,14 +18,34 @@ jest.mock("react-router-dom", () => {
   };
 });
 
-describe("<SignUpScreen />", () => {
+describe("<EditProfile />", () => {
   let mockedClient = createMockClient();
   let renderResult: RenderResult;
   beforeEach(async () => {
     await waitFor(() => {
       renderResult = render(
         <ApolloProvider client={mockedClient}>
-          <SignUpScreen />
+          <MockedProvider
+            mocks={[
+              {
+                request: {
+                  query: ME_QUERY,
+                },
+                result: {
+                  data: {
+                    me: {
+                      id: 1,
+                      email: "test@test.com",
+                      role: UserRole.Client,
+                      verified: false,
+                    },
+                  },
+                },
+              },
+            ]}
+          >
+            <EditProfile />
+          </MockedProvider>
         </ApolloProvider>
       );
     });
@@ -31,7 +53,7 @@ describe("<SignUpScreen />", () => {
 
   it("should render well", async () => {
     await waitFor(() => {
-      expect(document.title).toBe("Sign Up | Uber Eats");
+      expect(document.title).toBe("Edit Profile | Uber Eats");
     });
   });
 
@@ -39,31 +61,20 @@ describe("<SignUpScreen />", () => {
     const { getByRole, getByPlaceholderText, getByText, debug } = renderResult;
     const emailInput = getByPlaceholderText("Email");
     const passwordInput = getByPlaceholderText("Password");
-    const submitButton = getByRole("button");
 
     // email validation
     await waitFor(() => {
       userEvent.type(emailInput, "test@test");
     });
     getByText("• It must be in email format.");
-    // await waitFor(() => {
-    //   userEvent.clear(emailInput);
-    // });
-    // getByText("• Email is required.");
-
-    // password validation
     await waitFor(() => {
       userEvent.type(passwordInput, "123");
     });
     getByText("• Password should be longer than 4.");
-    // await waitFor(() => {
-    //   userEvent.clear(passwordInput);
-    // });
-    // getByText("• Password is required.");
   });
 
   it("submits mutations with form values", async () => {
-    const { getByRole, getByPlaceholderText, getByText } = renderResult;
+    const { getByRole, getByPlaceholderText, getByText, debug } = renderResult;
     const emailInput = getByPlaceholderText("Email");
     const passwordInput = getByPlaceholderText("Password");
     const submitButton = getByRole("button");
@@ -74,29 +85,29 @@ describe("<SignUpScreen />", () => {
     };
     const mockedMutationResponse = jest.fn().mockResolvedValue({
       data: {
-        createAccount: {
+        editProfile: {
           ok: true,
           error: "test-error",
         },
       },
     });
     mockedClient.setRequestHandler(
-      CREATE_ACCOUNT_MUTATION,
+      EDIT_PROFILE_MUTATION,
       mockedMutationResponse
     );
-    jest.spyOn(window, "alert").mockImplementation(() => null);
+    // jest.spyOn(window, "alert").mockImplementation(() => null);
     await waitFor(() => {
       userEvent.type(emailInput, formData.email);
       userEvent.type(passwordInput, formData.password);
       userEvent.click(submitButton);
     });
-    expect(mockedMutationResponse).toHaveBeenCalledTimes(1);
-    expect(mockedMutationResponse).toHaveBeenCalledWith({
-      input: formData,
-    });
-    getByText("• test-error");
-    expect(mockNavigate).toHaveBeenCalledWith("/");
-    expect(window.alert).toHaveBeenCalledWith("Account Created. Sign in now!");
+    // expect(mockedMutationResponse).toHaveBeenCalledTimes(1);
+    // expect(mockedMutationResponse).toHaveBeenCalledWith({
+    //   input: formData,
+    // });
+    // getByText("• test-error");
+    // expect(mockNavigate).toHaveBeenCalledWith("/");
+    // expect(window.alert).toHaveBeenCalledWith("Profile is updated!");
   });
 
   afterAll(() => {

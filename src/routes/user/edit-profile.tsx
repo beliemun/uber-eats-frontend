@@ -10,7 +10,7 @@ import {
 } from "../../__generated__/editProfile";
 import { Helmet } from "react-helmet-async";
 
-const EDIT_PROFILE_MUTATION = gql`
+export const EDIT_PROFILE_MUTATION = gql`
   mutation editProfile($input: EditProfileInput!) {
     editProfile(input: $input) {
       ok

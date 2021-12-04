@@ -8,7 +8,7 @@ import {
   searchRestaurantVariables,
 } from "../../__generated__/searchRestaurant";
 
-const SEARCH_RESTAURANT = gql`
+export const SEARCH_RESTAURANT = gql`
   query searchRestaurant($input: SearchRestaurantInput!) {
     searchRestaurant(input: $input) {
       ok
@@ -24,13 +24,10 @@ const SEARCH_RESTAURANT = gql`
 `;
 
 export const SearchScreen: React.FC = () => {
-  const onCompleted = (data: searchRestaurant) => {
-    console.log(data);
-  };
   const [searchQuery] = useLazyQuery<
     searchRestaurant,
     searchRestaurantVariables
-  >(SEARCH_RESTAURANT, { onCompleted });
+  >(SEARCH_RESTAURANT);
 
   const navigate = useNavigate();
   const location = useLocation();

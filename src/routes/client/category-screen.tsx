@@ -43,7 +43,6 @@ export const CategoryScreen: React.FC = () => {
       },
     }
   );
-
   return (
     <div>
       <SearchBar />

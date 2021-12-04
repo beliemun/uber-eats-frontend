@@ -1,6 +1,5 @@
 import { MockedProvider } from "@apollo/client/testing";
-import { RenderResult, waitFor } from "@testing-library/react";
-import { render } from "../../../test-utils";
+import { render, RenderResult, waitFor } from "../../../test-utils";
 import {
   seeRetaurants_seeCategories_categories,
   seeRetaurants_seeRestaurants_results,

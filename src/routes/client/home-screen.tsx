@@ -1,5 +1,5 @@
-import React, { useState } from "react";
 import { gql, useQuery } from "@apollo/client";
+import React, { useState } from "react";
 import {
   seeRetaurants,
   seeRetaurantsVariables,
@@ -40,7 +40,6 @@ export const HomeScreen: React.FC = () => {
       variables: { input: { page } },
     }
   );
-
   return (
     <div>
       <SearchBar />

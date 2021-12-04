@@ -30,41 +30,43 @@ describe("<HomeScreen />", () => {
     name: "testRestaurant",
   };
 
-  beforeEach(() => {
-    renderResult = render(
-      <MockedProvider
-        mocks={[
-          {
-            request: {
-              query: SEE_RESTAURANT_QUERY,
-              variables: {
-                input: {
-                  page: 1,
+  beforeEach(async () => {
+    await waitFor(() => {
+      renderResult = render(
+        <MockedProvider
+          mocks={[
+            {
+              request: {
+                query: SEE_RESTAURANT_QUERY,
+                variables: {
+                  input: {
+                    page: 1,
+                  },
+                },
+              },
+              result: {
+                data: {
+                  seeCategories: {
+                    ok: true,
+                    error: "test-error",
+                    categories: [category],
+                  },
+                  seeRestaurants: {
+                    ok: true,
+                    error: "test-error",
+                    totalPages: 1,
+                    totalResults: 1,
+                    results: [restaurant],
+                  },
                 },
               },
             },
-            result: {
-              data: {
-                seeCategories: {
-                  ok: true,
-                  error: "test-error",
-                  categories: [category],
-                },
-                seeRestaurants: {
-                  ok: true,
-                  error: "test-error",
-                  totalPages: 1,
-                  totalResults: 1,
-                  results: [restaurant],
-                },
-              },
-            },
-          },
-        ]}
-      >
-        <HomeScreen />
-      </MockedProvider>
-    );
+          ]}
+        >
+          <HomeScreen />
+        </MockedProvider>
+      );
+    });
   });
 
   it("should render well", async () => {

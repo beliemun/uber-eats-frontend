@@ -1,9 +1,10 @@
 import { MockedProvider } from "@apollo/client/testing";
-import { render, waitFor, RenderResult } from "../../../test-utils";
+import { waitFor } from "@testing-library/react";
+import { render, RenderResult } from "../../../test-utils";
 import { seeRetaurants_seeRestaurants_results } from "../../../__generated__/seeRetaurants";
-import { RestaurantScreen, RESTAURANT_QEURY } from "../restaurant-screen";
+import { SearchScreen, SEARCH_RESTAURANT } from "../search-screen";
 
-describe("<RestaurantScreen />", () => {
+describe("<SearchScreen />", () => {
   let renderResult: RenderResult;
   const restaurant: seeRetaurants_seeRestaurants_results = {
     __typename: "Restaurant",
@@ -25,31 +26,33 @@ describe("<RestaurantScreen />", () => {
           mocks={[
             {
               request: {
-                query: RESTAURANT_QEURY,
+                query: SEARCH_RESTAURANT,
                 variables: {
                   input: {
-                    restaurantId: 1,
+                    page: 1,
+                    term: "test-term",
                   },
                 },
               },
               result: {
                 data: {
-                  restaurant: {
+                  searchRestaurant: {
                     ok: true,
                     error: "test-error",
-                    restaurant,
+                    totalPages: 1,
+                    totalResults: 1,
+                    restaurants: [restaurant],
                   },
                 },
               },
             },
           ]}
         >
-          <RestaurantScreen />
+          <SearchScreen />
         </MockedProvider>
       );
     });
   });
-
   it("should render well", async () => {
     const {} = renderResult;
     await waitFor(async () => {

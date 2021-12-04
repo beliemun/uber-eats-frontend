@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import React, { useEffect } from "react";
+import React from "react";
 import { useParams } from "react-router";
 import { RESTAURANT_FRAGMENT } from "../../fragments";
 import {
@@ -33,11 +33,6 @@ export const RestaurantScreen: React.FC = () => {
       },
     },
   });
-
-  useEffect(() => {
-    console.log("data:", data);
-  }, [data]);
-
   return (
     <div>
       <div
