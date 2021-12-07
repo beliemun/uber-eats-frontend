@@ -36,7 +36,7 @@ Cypress.Commands.add("assertSignOut", () => {
 Cypress.Commands.add("signIn", (email, password) => {
   cy.visit("/");
   cy.assertSignOut();
-  cy.title().should("eq", "Sign In | Uber Eats");
+  cy.assertTitle("Sign In");
   cy.findByPlaceholderText(/email/i).type(email);
   cy.findByPlaceholderText(/password/i).type(password);
   cy.findByRole("button")
@@ -46,11 +46,16 @@ Cypress.Commands.add("signIn", (email, password) => {
   cy.assertSignIn();
 });
 
+Cypress.Commands.add("assertTitle", (title) => {
+  cy.title().should("eq", `${title} | Uber Eats`);
+});
+
 declare global {
   namespace Cypress {
     interface Chainable {
       assertSignIn(): void;
       assertSignOut(): void;
+      assertTitle(title: string): void;
       signIn(email: string, password: string): void;
     }
   }

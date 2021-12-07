@@ -40,7 +40,7 @@ export const EditProfile: React.FC = () => {
   const client = useApolloClient();
   const onCompleted = ({ editProfile: { ok } }: editProfile) => {
     const { email, password } = getValues();
-    if (ok && email !== userData?.me.email && userData) {
+    if (ok && userData && email !== userData.me.email) {
       client.writeFragment({
         id: `User:${userData.me.id}`,
         fragment: gql`
