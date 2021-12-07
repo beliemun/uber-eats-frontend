@@ -124,7 +124,7 @@ export const SignInScreen: React.FC = () => {
             to="/sign-up"
             className="text-sm font-medium text-green-400 hover:underline"
           >
-            Create a Account
+            Create an Account
           </Link>
         </div>
       </div>

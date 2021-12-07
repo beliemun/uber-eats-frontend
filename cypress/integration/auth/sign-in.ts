@@ -1,4 +1,4 @@
-describe("<SignInScreen />", () => {
+describe("Sign In", () => {
   it("should go to Sign In Screen", () => {
     cy.visit("http://localhost:3000")
       .title()
@@ -15,13 +15,7 @@ describe("<SignInScreen />", () => {
       "• Password should be longer than 4."
     );
   });
-  it("can fill out the form", () => {
-    cy.visit("/");
-    cy.findByPlaceholderText(/email/i).type("client@google.com");
-    cy.findByPlaceholderText(/password/i).type("1234");
-    cy.findByRole("button")
-      .should("not.have.class", "pointer-events-none")
-      .click();
-    cy.window().its("localStorage.token").should("be.a", "string");
+  it("can fill out the form and sign in", () => {
+    cy.signIn("test@google.com", "1234");
   });
 });

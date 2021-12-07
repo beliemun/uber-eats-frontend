@@ -24,3 +24,34 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 import "@testing-library/cypress/add-commands";
+
+Cypress.Commands.add("assertSignIn", () => {
+  cy.window().its("localStorage.token").should("be.a", "string");
+});
+
+Cypress.Commands.add("assertSignOut", () => {
+  cy.window().its("localStorage.token").should("be.undefined");
+});
+
+Cypress.Commands.add("signIn", (email, password) => {
+  cy.visit("/");
+  cy.assertSignOut();
+  cy.title().should("eq", "Sign In | Uber Eats");
+  cy.findByPlaceholderText(/email/i).type(email);
+  cy.findByPlaceholderText(/password/i).type(password);
+  cy.findByRole("button")
+    .should("not.have.class", "pointer-events-none")
+    .click();
+
+  cy.assertSignIn();
+});
+
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      assertSignIn(): void;
+      assertSignOut(): void;
+      signIn(email: string, password: string): void;
+    }
+  }
+}
