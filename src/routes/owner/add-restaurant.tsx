@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import React from "react";
+import React, { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
 import { Button } from "../../components/button";
@@ -22,6 +22,7 @@ interface ICreateRestaurantFormProps {
   name: string;
   address: string;
   categoryName: string;
+  file: FileList;
 }
 
 export const AddRestaurant: React.FC = () => {
@@ -31,22 +32,45 @@ export const AddRestaurant: React.FC = () => {
     handleSubmit,
     formState: { errors, isValid },
   } = useForm<ICreateRestaurantFormProps>({ mode: "onChange" });
-  const [createRestaurant, { data, loading }] = useMutation<
+  const onCompleted = (data: createRestaurant) => {
+    const {
+      createRestaurant: { ok },
+    } = data;
+    if (ok) {
+      setUploading(false);
+    }
+  };
+  const [createRestaurant, { data }] = useMutation<
     createRestaurant,
     createRestaurantVariables
-  >(CREATE_RESTAURANT_MUTATION);
-  const onSubmit = () => {
-    const { name, address, categoryName } = getValues();
-    createRestaurant({
-      variables: {
-        input: {
-          name,
-          address,
-          categoryName,
-          coverImage: "http://",
+  >(CREATE_RESTAURANT_MUTATION, { onCompleted });
+  const [uploading, setUploading] = useState(false);
+  const onSubmit = async () => {
+    try {
+      setUploading(true);
+      const { name, address, categoryName, file } = getValues();
+      const actualFile = file[0];
+      const formBody = new FormData();
+      formBody.append("file", actualFile);
+      const request = await (
+        await fetch("http://localhost:4000/uploads", {
+          method: "POST",
+          body: formBody,
+        })
+      ).json();
+      createRestaurant({
+        variables: {
+          input: {
+            name,
+            address,
+            categoryName,
+            coverImage: request.url,
+          },
         },
-      },
-    });
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <div className="max-w-4xl mx-auto mt-16">
@@ -107,7 +131,20 @@ export const AddRestaurant: React.FC = () => {
         {errors.categoryName?.message && (
           <FormError message={errors.categoryName?.message} />
         )}
-        <Button text={"Add Restaurant"} canClick={isValid} loading={loading} />
+        <input
+          className="input"
+          type="file"
+          accept="image/*"
+          required
+          {...register("file", {
+            required: "Cover Image is required.",
+          })}
+        />
+        <Button
+          text={"Add Restaurant"}
+          canClick={isValid || uploading}
+          loading={uploading}
+        />
         {data?.createRestaurant.error && (
           <FormError message={data?.createRestaurant.error} />
         )}
