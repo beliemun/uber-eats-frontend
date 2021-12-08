@@ -11,6 +11,8 @@ import { NotFound } from "../routes/404";
 import { Loading } from "../components/loading";
 import { Header } from "../components/header";
 import { RestaurantScreen } from "../routes/client/restaurant-screen";
+import { MyRestaurant } from "../routes/owner/my-restaurants";
+import { AddRestaurant } from "../routes/owner/add-restaurant";
 
 const renderCommonRoutes = () => (
   <>
@@ -29,6 +31,13 @@ const renderClientRoutes = () => (
   </>
 );
 
+const renderOwnerRoutes = () => (
+  <>
+    <Route path="/" element={<MyRestaurant />} />
+    <Route path="/add-restaurant" element={<AddRestaurant />} />
+  </>
+);
+
 export const Auth: React.FC = () => {
   const { data, loading, error } = useMe();
 
@@ -41,6 +50,7 @@ export const Auth: React.FC = () => {
       <Routes>
         {renderCommonRoutes()}
         {data?.me.role === UserRole.Client && renderClientRoutes()}
+        {data?.me.role === UserRole.Owner && renderOwnerRoutes()}
       </Routes>
     </>
   );
