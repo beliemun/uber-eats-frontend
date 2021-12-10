@@ -43,7 +43,7 @@ export const AddRestaurant: React.FC = () => {
     const {
       createRestaurant: { ok, restaurantId },
     } = data;
-    const { name, address, categoryName, file } = getValues();
+    const { name, address, categoryName } = getValues();
 
     if (ok) {
       setUploading(false);
@@ -116,7 +116,7 @@ export const AddRestaurant: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto mt-16">
       <Helmet>
-        <title>Add Restaurant| Uber Eats</title>
+        <title>Add Restaurant | Uber Eats</title>
       </Helmet>
       <h2 className="font-bold text-4xl text-green-400 mb-5">Add Restaurant</h2>
       <h4 className="text-sm font-medium mb-5">

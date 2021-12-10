@@ -1,5 +1,5 @@
-import { gql, useApolloClient, useQuery } from "@apollo/client";
-import React, { useEffect } from "react";
+import { gql, useQuery } from "@apollo/client";
+import React from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { Restaurant } from "../../components/restaurant";
@@ -19,7 +19,7 @@ export const MY_RESTAURANTS_QUERY = gql`
   ${RESTAURANT_FRAGMENT}
 `;
 
-export const MyRestaurant: React.FC = () => {
+export const MyRestaurants: React.FC = () => {
   const { data } = useQuery<myRestaurants>(MY_RESTAURANTS_QUERY);
   return (
     <div className="max-w-4xl mx-auto mt-16">

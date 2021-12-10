@@ -11,8 +11,10 @@ import { NotFound } from "../routes/404";
 import { Loading } from "../components/loading";
 import { Header } from "../components/header";
 import { RestaurantScreen } from "../routes/client/restaurant-screen";
-import { MyRestaurant } from "../routes/owner/my-restaurants";
+import { MyRestaurants } from "../routes/owner/my-restaurants";
 import { AddRestaurant } from "../routes/owner/add-restaurant";
+import { MyRestaurant } from "../routes/owner/my-restaurant";
+import { AddDish } from "../routes/owner/add-dish";
 
 const renderCommonRoutes = () => (
   <>
@@ -33,8 +35,10 @@ const renderClientRoutes = () => (
 
 const renderOwnerRoutes = () => (
   <>
-    <Route path="/" element={<MyRestaurant />} />
+    <Route path="/" element={<MyRestaurants />} />
     <Route path="/add-restaurant" element={<AddRestaurant />} />
+    <Route path="/restaurant/:id" element={<MyRestaurant />} />
+    <Route path="/restaurant/:id/add-dish" element={<AddDish />} />
   </>
 );
 
