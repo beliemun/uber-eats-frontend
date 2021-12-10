@@ -1,19 +1,23 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useApolloClient, useMutation } from "@apollo/client";
 import React, { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
 import { Button } from "../../components/button";
 import { FormError } from "../../components/form-error";
 import {
   createRestaurant,
   createRestaurantVariables,
 } from "../../__generated__/createRestaurant";
+import { MY_RESTAURANTS_QUERY } from "./my-restaurants";
+// import { MY_RESTAURANTS_QUERY } from "./my-restaurants";
 
 const CREATE_RESTAURANT_MUTATION = gql`
   mutation createRestaurant($input: CreateRestaurantInput!) {
     createRestaurant(input: $input) {
       ok
       error
+      restaurantId
     }
   }
 `;
@@ -26,24 +30,60 @@ interface ICreateRestaurantFormProps {
 }
 
 export const AddRestaurant: React.FC = () => {
+  const navigate = useNavigate();
   const {
     register,
     getValues,
     handleSubmit,
     formState: { errors, isValid },
   } = useForm<ICreateRestaurantFormProps>({ mode: "onChange" });
+  const client = useApolloClient();
+  const [imageUrl, setImageUrl] = useState("");
   const onCompleted = (data: createRestaurant) => {
     const {
-      createRestaurant: { ok },
+      createRestaurant: { ok, restaurantId },
     } = data;
+    const { name, address, categoryName, file } = getValues();
+
     if (ok) {
       setUploading(false);
+
+      const queryResult = client.readQuery({ query: MY_RESTAURANTS_QUERY });
+      client.writeQuery({
+        query: MY_RESTAURANTS_QUERY,
+        data: {
+          myRestaurants: {
+            ...queryResult.myRestaurants,
+            restaurants: [
+              {
+                __typename: "Restaurant",
+                id: restaurantId,
+                name,
+                address,
+                coverImage: imageUrl,
+                isPromoted: false,
+                category: {
+                  __typename: "Category",
+                  name: categoryName,
+                },
+              },
+              ...queryResult.myRestaurants.restaurants,
+            ],
+          },
+        },
+      });
+
+      navigate("/");
     }
   };
   const [createRestaurant, { data }] = useMutation<
     createRestaurant,
     createRestaurantVariables
-  >(CREATE_RESTAURANT_MUTATION, { onCompleted });
+  >(CREATE_RESTAURANT_MUTATION, {
+    onCompleted,
+    // 기존 식당이 많아질 경우, 너무 많은 데이터를 다시 받아야 하므로 refectch하지 않고 캐시를 수정한다.
+    // refetchQueries: [{ query: MY_RESTAURANTS_QUERY }],
+  });
   const [uploading, setUploading] = useState(false);
   const onSubmit = async () => {
     try {
@@ -52,19 +92,20 @@ export const AddRestaurant: React.FC = () => {
       const actualFile = file[0];
       const formBody = new FormData();
       formBody.append("file", actualFile);
-      const request = await (
+      const { url: coverImage } = await (
         await fetch("http://localhost:4000/uploads", {
           method: "POST",
           body: formBody,
         })
       ).json();
+      setImageUrl(coverImage);
       createRestaurant({
         variables: {
           input: {
             name,
             address,
             categoryName,
-            coverImage: request.url,
+            coverImage,
           },
         },
       });
@@ -142,7 +183,7 @@ export const AddRestaurant: React.FC = () => {
         />
         <Button
           text={"Add Restaurant"}
-          canClick={isValid || uploading}
+          canClick={isValid && !uploading}
           loading={uploading}
         />
         {data?.createRestaurant.error && (
