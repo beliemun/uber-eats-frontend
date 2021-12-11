@@ -76,8 +76,8 @@ export const MyRestaurant: React.FC = () => {
           </div>
         ) : (
           <>
-            {data?.myRestaurant.restaurant?.menu.map((dish) => (
-              <h1>{dish.name}</h1>
+            {data?.myRestaurant.restaurant?.menu.map((dish, index) => (
+              <h1 key={index}>{dish.name}</h1>
             ))}
           </>
         )}
