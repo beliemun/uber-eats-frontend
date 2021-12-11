@@ -1,6 +1,6 @@
 import { useMutation } from "@apollo/client";
 import gql from "graphql-tag";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router";
@@ -55,7 +55,7 @@ export const AddDish: React.FC = () => {
       name: rest[`option-name-${option}`],
       extra: +rest[`option-extra-${option}`],
     }));
-    console.log(optionObject);
+    console.log(id, name, price, description, optionObject);
     await createDish({
       variables: {
         input: {
@@ -67,6 +67,7 @@ export const AddDish: React.FC = () => {
         },
       },
     });
+    console.log("***");
     navigate(-1);
   };
   const [options, setOptions] = useState<number[]>([]);
@@ -78,10 +79,6 @@ export const AddDish: React.FC = () => {
     unregister(`option-name-${id}`);
     unregister(`option-extra-${id}`);
   };
-
-  useEffect(() => {
-    console.log(options);
-  }, [options]);
 
   return (
     <div className="max-w-4xl mx-auto mt-16">
