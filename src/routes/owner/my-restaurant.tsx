@@ -4,11 +4,23 @@ import React from "react";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
 import { Dish } from "../../components/dish";
-import { DISH_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragments";
+import {
+  DISH_FRAGMENT,
+  ORDER_FRAGMENT,
+  RESTAURANT_FRAGMENT,
+} from "../../fragments";
 import {
   myRestaurant,
   myRestaurantVariables,
 } from "../../__generated__/myRestaurant";
+import {
+  VictoryAxis,
+  VictoryChart,
+  VictoryLabel,
+  VictoryLine,
+  VictoryTheme,
+  VictoryVoronoiContainer,
+} from "victory";
 
 export const MY_RESTAURANT_QUERY = gql`
   query myRestaurant($input: MyRestaurantInput!) {
@@ -20,11 +32,15 @@ export const MY_RESTAURANT_QUERY = gql`
         menu {
           ...DishFragment
         }
+        orders {
+          ...OrderFragment
+        }
       }
     }
   }
   ${RESTAURANT_FRAGMENT}
   ${DISH_FRAGMENT}
+  ${ORDER_FRAGMENT}
 `;
 
 interface IParams {
@@ -39,6 +55,16 @@ export const MyRestaurant: React.FC = () => {
       variables: { input: { id: +id } },
     }
   );
+  console.log(data);
+  const charData = [
+    { x: 1, y: 152000 },
+    { x: 2, y: 282100 },
+    { x: 3, y: 455000 },
+    { x: 4, y: 749000 },
+    { x: 5, y: 1752000 },
+    { x: 6, y: 1249000 },
+    { x: 7, y: 1452000 },
+  ];
   return (
     <div>
       <div
@@ -59,6 +85,7 @@ export const MyRestaurant: React.FC = () => {
           </h6>
         </div>
       </div>
+
       <div className="max-w-4xl mx-auto">
         <div className="flex-col py-10">
           <Link
@@ -82,6 +109,43 @@ export const MyRestaurant: React.FC = () => {
             ))}
           </div>
         )}
+      </div>
+
+      <div className="max-w-4xl mx-auto">
+        <h2 className="font-bold text-4xl text-green-400 my-6">Sales</h2>
+        <VictoryChart
+          height={300}
+          theme={VictoryTheme.material}
+          width={window.innerWidth}
+          domainPadding={50}
+          containerComponent={<VictoryVoronoiContainer />}
+        >
+          <VictoryLine
+            labels={({ datum }) => `${datum.y}원`}
+            labelComponent={
+              // renderInPortal 내부 컴포넌트로 넣어서 안짤리게 보이게 할 때 사용
+              <VictoryLabel style={{ fontSize: 20 }} renderInPortal dy={-15} />
+            }
+            data={data?.myRestaurant.restaurant?.orders.map((order) => ({
+              x: order.createdAt,
+              y: order.total,
+            }))}
+            interpolation={"natural"}
+            style={{ data: { strokeWidth: 5, stroke: "green" } }}
+          />
+          <VictoryAxis
+            style={{
+              tickLabels: {
+                fontSize: 16,
+                fontWeight: 600,
+                wordSpacing: -3,
+                angle: 30,
+                fill: "#00000060",
+              },
+            }}
+            tickFormat={(tick) => new Date(tick).toLocaleDateString("ko")}
+          />
+        </VictoryChart>
       </div>
     </div>
   );
