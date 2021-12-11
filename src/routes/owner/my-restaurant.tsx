@@ -55,16 +55,6 @@ export const MyRestaurant: React.FC = () => {
       variables: { input: { id: +id } },
     }
   );
-  console.log(data);
-  const charData = [
-    { x: 1, y: 152000 },
-    { x: 2, y: 282100 },
-    { x: 3, y: 455000 },
-    { x: 4, y: 749000 },
-    { x: 5, y: 1752000 },
-    { x: 6, y: 1249000 },
-    { x: 7, y: 1452000 },
-  ];
   return (
     <div>
       <div
@@ -99,7 +89,7 @@ export const MyRestaurant: React.FC = () => {
           </Link>
         </div>
         {data?.myRestaurant.restaurant?.menu.length === 0 ? (
-          <div className="text font-bold text-rose-500">
+          <div className="text-sm text-gray-500">
             <h4>Please upload a dish!</h4>
           </div>
         ) : (

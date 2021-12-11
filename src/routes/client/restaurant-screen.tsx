@@ -1,7 +1,9 @@
 import { gql, useQuery } from "@apollo/client";
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router";
-import { RESTAURANT_FRAGMENT } from "../../fragments";
+import { Dish } from "../../components/dish";
+import { DISH_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragments";
+import { CreateOrderItemInput } from "../../__generated__/globalTypes";
 import {
   restaurant,
   restaurantVariables,
@@ -14,10 +16,23 @@ export const RESTAURANT_QEURY = gql`
       error
       restaurant {
         ...RestaurantFragment
+        menu {
+          ...DishFragment
+        }
       }
     }
   }
   ${RESTAURANT_FRAGMENT}
+  ${DISH_FRAGMENT}
+`;
+
+const CREATE_ORDER_MUTATION = gql`
+  mutation createOrder($input: CreateOrderInput!) {
+    createOrder(input: $input) {
+      ok
+      error
+    }
+  }
 `;
 
 interface IRestaurantParams {
@@ -33,6 +48,25 @@ export const RestaurantScreen: React.FC = () => {
       },
     },
   });
+  const [orderStarted, setOrderStarted] = useState(false);
+  const [orderItems, setOrderItems] = useState<CreateOrderItemInput[]>([]);
+  const startOrder = () => {
+    setOrderStarted(!orderStarted);
+    setOrderItems([]);
+  };
+  const addOrderItem = (dishId: number) => {
+    if (isSelected(dishId)) {
+      return;
+    }
+    setOrderItems((current) => [{ dishId, options: null }, ...current]);
+  };
+  const removeOrderItem = (dishId: number) => {
+    setOrderItems(orderItems.filter((item) => item.dishId !== dishId));
+  };
+  const isSelected = (dishId: number) => {
+    return Boolean(orderItems.find((order) => order.dishId === dishId));
+  };
+  console.log(orderItems);
   return (
     <div>
       <div
@@ -51,7 +85,35 @@ export const RestaurantScreen: React.FC = () => {
           </h6>
         </div>
       </div>
-      <div className="max-w-4xl mx-auto"></div>
+
+      <div className="max-w-4xl mx-auto mt-10">
+        <div className="pb-10">
+          <span
+            onClick={startOrder}
+            className="text-white bg-green-500 py-4 px-8 cursor-pointer"
+          >
+            {`${orderStarted ? "Ordering" : "Start Order"}`}
+          </span>
+        </div>
+        {data?.restaurant.restaurant?.menu.length === 0 ? (
+          <div className="text-sm text-gray-500">
+            <h4>Menu not found</h4>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {data?.restaurant.restaurant?.menu.map((dish) => (
+              <Dish
+                key={dish.id}
+                dish={dish}
+                orderStarted={orderStarted}
+                addOrderItem={addOrderItem}
+                removeOrderItem={removeOrderItem}
+                isSelected={isSelected(dish.id)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
