@@ -1,8 +1,14 @@
-import { useQuery } from "@apollo/client";
+import { useQuery, useSubscription } from "@apollo/client";
 import gql from "graphql-tag";
-import React from "react";
+import React, { useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { useParams } from "react-router";
+import { FULL_ORDER_FRAGMENT } from "../../fragments";
 import { getOrder, getOrderVariables } from "../../__generated__/getOrder";
+import {
+  orderUpdates,
+  orderUpdatesVariables,
+} from "../../__generated__/orderUpdates";
 
 const GET_ORDER_QUERY = gql`
   query getOrder($input: GetOrderInput!) {
@@ -10,21 +16,20 @@ const GET_ORDER_QUERY = gql`
       ok
       error
       order {
-        id
-        status
-        total
-        driver {
-          email
-        }
-        customer {
-          email
-        }
-        restaurant {
-          name
-        }
+        ...FullOrderFragment
       }
     }
   }
+  ${FULL_ORDER_FRAGMENT}
+`;
+
+const ORDER_SUBSCRIPTION = gql`
+  subscription orderUpdates($input: OrderUpdatesInput!) {
+    orderUpdates(input: $input) {
+      ...FullOrderFragment
+    }
+  }
+  ${FULL_ORDER_FRAGMENT}
 `;
 
 interface IParams {
@@ -33,11 +38,79 @@ interface IParams {
 
 export const Order: React.FC = () => {
   const params = useParams() as IParams;
-  const { data } = useQuery<getOrder, getOrderVariables>(GET_ORDER_QUERY, {
+  const { data, loading, subscribeToMore } = useQuery<
+    getOrder,
+    getOrderVariables
+  >(GET_ORDER_QUERY, {
     variables: {
       input: { id: +params.id },
     },
   });
-  console.log(data);
-  return <h1>{params.id}</h1>;
+  useEffect(() => {
+    if (data?.getOrder.ok) {
+      subscribeToMore({
+        document: ORDER_SUBSCRIPTION,
+        variables: { input: { id: +params.id } },
+        updateQuery: (
+          prev,
+          {
+            subscriptionData: { data },
+          }: { subscriptionData: { data: orderUpdates } }
+        ) => {
+          if (!data) return prev;
+          // query 빋은 data와 같은 형태로 리턴해야한다.
+          return {
+            getOrder: {
+              ...prev.getOrder, // ok, error 가 있는 영역
+              order: {
+                ...data.orderUpdates, // 업데이트 받은 order
+              },
+            },
+          };
+        },
+      });
+    }
+  }, [data]);
+  const { data: subscriptionData } = useSubscription<
+    orderUpdates,
+    orderUpdatesVariables
+  >(ORDER_SUBSCRIPTION, { variables: { input: { id: +params.id } } });
+  return !loading || !data ? (
+    <div className="flex justify-center pt-20">
+      <Helmet>
+        <title>Order #{params.id} | Uber Eats</title>
+      </Helmet>
+      <div className="w-full max-w-md border border-green-500">
+        <h2 className="bg-green-500 font-medium text-white text-center text-xl py-4">
+          Order #{data?.getOrder.order?.id}
+        </h2>
+        <div className="px-4">
+          <h3 className="text-center text-2xl font-bold text-green-500 py-6">
+            {data?.getOrder.order?.total}원
+          </h3>
+          <h4 className="py-4 border-t border-gray-200">
+            Prepared By:{" "}
+            <span className="font-bold">
+              {data?.getOrder.order?.restaurant?.name}
+            </span>
+          </h4>
+          <h4 className="py-4 border-t border-gray-200">
+            Deliver To:{" "}
+            <span className="font-bold">
+              {data?.getOrder.order?.customer?.email}
+            </span>
+          </h4>
+          <h4 className="py-4 border-t border-b border-gray-200">
+            Driver:{" "}
+            <span className="font-bold">
+              {data?.getOrder.order?.driver
+                ? data?.getOrder.order?.driver.email
+                : "Not yet"}
+            </span>
+          </h4>
+          <h3 className="py-4 text-center text-xl text-rose-500">{`Status: ${data?.getOrder.order?.status}`}</h3>
+        </div>
+      </div>
+    </div>
+  ) : null;
 };
