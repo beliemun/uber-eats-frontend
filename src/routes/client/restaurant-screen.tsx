@@ -2,11 +2,11 @@ import { gql, useQuery } from "@apollo/client";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { Dish } from "../../components/dish";
+import { DishOption } from "../../components/dish-option";
 import { DISH_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragments";
 import { useMe } from "../../hooks/useMe";
 import {
   CreateOrderItemInput,
-  OrderItemOptionInputType,
   UserRole,
 } from "../../__generated__/globalTypes";
 import {
@@ -47,7 +47,6 @@ interface IRestaurantParams {
 export const RestaurantScreen: React.FC = () => {
   const { data: userData } = useMe();
   const [isCustomer] = useState(userData?.me.role === UserRole.Client);
-
   const params = useParams() as IRestaurantParams;
   const { data } = useQuery<restaurant, restaurantVariables>(RESTAURANT_QEURY, {
     variables: {
@@ -77,39 +76,7 @@ export const RestaurantScreen: React.FC = () => {
   const removeOrderItem = (dishId: number) =>
     setOrderItems(orderItems.filter((item) => item.dishId !== dishId));
   // 추가로 선택할 수 있는 옵션이 있는 음식의 경우, 옵션을 추가
-  const addOptionToItem = (
-    dishId: number,
-    option: OrderItemOptionInputType
-  ) => {
-    if (!isSelected(dishId)) {
-      return;
-    }
-    // 이전 주문을 기억했다가
-    const oldItem = getItem(dishId);
-    if (oldItem) {
-      // 기존 선택된 옵션이 있는지 확인 (같은 옵션을 여러개 추가하지 못하도록 정책 설정)
-      const hasOption = Boolean(
-        oldItem.options?.find((curOption) => curOption.name === option.name)
-      );
-      if (!hasOption) {
-        // 기존 주문을 지우고
-        removeOrderItem(dishId);
-        // 새로운 옵션을 추가하여 새로운 주문으로 추가
-        setOrderItems((prev) => [
-          { dishId, options: [option, ...oldItem.options!] },
-          ...prev,
-        ]);
-      } else {
-        window.alert("같은 옵션이 이미 추가되어 있습니다.");
-      }
-    }
-  };
-  const getOptionFromItem = (item: CreateOrderItemInput, optionName: string) =>
-    Boolean(item.options?.find((option) => option.name === optionName));
-  const isOptionSelected = (dishId: number, optionName: string) => {
-    const item = getItem(dishId);
-    return item ? getOptionFromItem(item, optionName) : false;
-  };
+
   useEffect(() => {
     console.log(orderItems);
   }, [orderItems]);
@@ -155,27 +122,23 @@ export const RestaurantScreen: React.FC = () => {
                 isSelected={isSelected(dish.id)}
                 addOrderItem={addOrderItem}
                 removeOrderItem={removeOrderItem}
-                addOptionToItem={addOptionToItem}
               >
                 {/* 컴포넌트에 너무 많은 props를 전달하지 않기 위해서 children으로 렌더함 */}
+                {/* isCustomer: role이 client 일때만 옵션이 보여야 하고 */}
+                {/* dish.options: 주문에 옵션이 있어야만 옵션이 보여야 하고 */}
+                {/* isSelected: 주문이 일단 담아져야 옵션을 볼 수 있다. */}
                 {isCustomer && dish.options && isSelected(dish.id) && (
                   <div className="pt-2 ">
                     {dish.options.map((option, index) => (
-                      <span
-                        onClick={() =>
-                          isOptionSelected(dish.id, option.name)
-                            ? null
-                            : addOptionToItem(dish.id, option)
-                        }
+                      <DishOption
                         key={index}
-                        className={`text-sm font-medium pr-2 ${
-                          isOptionSelected(dish.id, option.name)
-                            ? "text-gray-300"
-                            : "text-green-500 cursor-pointer hover:underline"
-                        }`}
-                      >
-                        {`${option.name}(+${option.extra}원)`}
-                      </span>
+                        dishId={dish.id}
+                        option={option}
+                        getItem={getItem}
+                        isSelected={isSelected}
+                        setOrderItems={setOrderItems}
+                        removeOrderItem={removeOrderItem}
+                      />
                     ))}
                   </div>
                 )}

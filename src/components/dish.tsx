@@ -7,7 +7,6 @@ interface IDishProps {
   isSelected?: boolean;
   addOrderItem?: (dishId: number) => void;
   removeOrderItem?: (dishId: number) => void;
-  addOptionToItem?: (dishId: number, option: any) => void;
 }
 
 export const Dish: React.FC<IDishProps> = ({
@@ -47,14 +46,11 @@ export const Dish: React.FC<IDishProps> = ({
               : "hidden"
           }`}
         >
-          주문 담기
+          {isSelected ? "주문 취소" : "주문 담기"}
         </span>
       </h4>
       <h5 className="text-sm mt-2">{dish.price}원</h5>
       <h5 className="text-sm text-gray-400">{dish.description}</h5>
-      {/* isCustomer: role이 client 일때만 옵션이 보여야 하고 */}
-      {/* dish.options: 주문에 옵션이 있어야만 옵션이 보여야 하고 */}
-      {/* isSelected: 주문이 일단 담아져야 옵션을 볼 수 있다. */}
       {dishOptions}
     </div>
   );
