@@ -1,9 +1,14 @@
 import { gql, useQuery } from "@apollo/client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { Dish } from "../../components/dish";
 import { DISH_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragments";
-import { CreateOrderItemInput } from "../../__generated__/globalTypes";
+import { useMe } from "../../hooks/useMe";
+import {
+  CreateOrderItemInput,
+  OrderItemOptionInputType,
+  UserRole,
+} from "../../__generated__/globalTypes";
 import {
   restaurant,
   restaurantVariables,
@@ -40,6 +45,9 @@ interface IRestaurantParams {
 }
 
 export const RestaurantScreen: React.FC = () => {
+  const { data: userData } = useMe();
+  const [isCustomer] = useState(userData?.me.role === UserRole.Client);
+
   const params = useParams() as IRestaurantParams;
   const { data } = useQuery<restaurant, restaurantVariables>(RESTAURANT_QEURY, {
     variables: {
@@ -54,19 +62,57 @@ export const RestaurantScreen: React.FC = () => {
     setOrderStarted(!orderStarted);
     setOrderItems([]);
   };
+  const getItem = (dishId: number) =>
+    orderItems.find((order) => order.dishId === dishId);
+  // 주문 리스트에 음식이 현재 추가되어 있는지 확인
+  const isSelected = (dishId: number) => Boolean(getItem(dishId));
+  // 주문할 음식
   const addOrderItem = (dishId: number) => {
     if (isSelected(dishId)) {
       return;
     }
-    setOrderItems((current) => [{ dishId, options: null }, ...current]);
+    setOrderItems((prev) => [{ dishId, options: [] }, ...prev]);
   };
-  const removeOrderItem = (dishId: number) => {
+  // 취소할 음식
+  const removeOrderItem = (dishId: number) =>
     setOrderItems(orderItems.filter((item) => item.dishId !== dishId));
+  // 추가로 선택할 수 있는 옵션이 있는 음식의 경우, 옵션을 추가
+  const addOptionToItem = (
+    dishId: number,
+    option: OrderItemOptionInputType
+  ) => {
+    if (!isSelected(dishId)) {
+      return;
+    }
+    // 이전 주문을 기억했다가
+    const oldItem = getItem(dishId);
+    if (oldItem) {
+      // 기존 선택된 옵션이 있는지 확인 (같은 옵션을 여러개 추가하지 못하도록 정책 설정)
+      const hasOption = Boolean(
+        oldItem.options?.find((curOption) => curOption.name === option.name)
+      );
+      if (!hasOption) {
+        // 기존 주문을 지우고
+        removeOrderItem(dishId);
+        // 새로운 옵션을 추가하여 새로운 주문으로 추가
+        setOrderItems((prev) => [
+          { dishId, options: [option, ...oldItem.options!] },
+          ...prev,
+        ]);
+      } else {
+        window.alert("같은 옵션이 이미 추가되어 있습니다.");
+      }
+    }
   };
-  const isSelected = (dishId: number) => {
-    return Boolean(orderItems.find((order) => order.dishId === dishId));
+  const getOptionFromItem = (item: CreateOrderItemInput, optionName: string) =>
+    Boolean(item.options?.find((option) => option.name === optionName));
+  const isOptionSelected = (dishId: number, optionName: string) => {
+    const item = getItem(dishId);
+    return item ? getOptionFromItem(item, optionName) : false;
   };
-  console.log(orderItems);
+  useEffect(() => {
+    console.log(orderItems);
+  }, [orderItems]);
   return (
     <div>
       <div
@@ -106,10 +152,34 @@ export const RestaurantScreen: React.FC = () => {
                 key={dish.id}
                 dish={dish}
                 orderStarted={orderStarted}
+                isSelected={isSelected(dish.id)}
                 addOrderItem={addOrderItem}
                 removeOrderItem={removeOrderItem}
-                isSelected={isSelected(dish.id)}
-              />
+                addOptionToItem={addOptionToItem}
+              >
+                {/* 컴포넌트에 너무 많은 props를 전달하지 않기 위해서 children으로 렌더함 */}
+                {isCustomer && dish.options && isSelected(dish.id) && (
+                  <div className="pt-2 ">
+                    {dish.options.map((option, index) => (
+                      <span
+                        onClick={() =>
+                          isOptionSelected(dish.id, option.name)
+                            ? null
+                            : addOptionToItem(dish.id, option)
+                        }
+                        key={index}
+                        className={`text-sm font-medium pr-2 ${
+                          isOptionSelected(dish.id, option.name)
+                            ? "text-gray-300"
+                            : "text-green-500 cursor-pointer hover:underline"
+                        }`}
+                      >
+                        {`${option.name}(+${option.extra}원)`}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </Dish>
             ))}
           </div>
         )}
