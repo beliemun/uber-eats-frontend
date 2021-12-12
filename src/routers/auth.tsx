@@ -15,11 +15,13 @@ import { MyRestaurants } from "../routes/owner/my-restaurants";
 import { AddRestaurant } from "../routes/owner/add-restaurant";
 import { MyRestaurant } from "../routes/owner/my-restaurant";
 import { AddDish } from "../routes/owner/add-dish";
+import { Order } from "../routes/user/order";
 
 const renderCommonRoutes = () => (
   <>
     <Route path="/confirm" element={<ConfirmEmail />} />
     <Route path="/edit-profile" element={<EditProfile />} />
+    <Route path="/orders/:id" element={<Order />} />
     <Route path="/*" element={<NotFound />} />
   </>
 );
