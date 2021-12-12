@@ -1,8 +1,8 @@
 import React from "react";
-import { myRestaurant_myRestaurant_restaurant_menu } from "../__generated__/myRestaurant";
+import { restaurant_restaurant_restaurant_menu } from "../__generated__/restaurant";
 
 interface IDishProps {
-  dish: myRestaurant_myRestaurant_restaurant_menu;
+  dish: restaurant_restaurant_restaurant_menu;
   orderStarted?: boolean;
   isSelected?: boolean;
   addOrderItem?: (dishId: number) => void;

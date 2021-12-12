@@ -1,10 +1,14 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { Dish } from "../../components/dish";
 import { DishOption } from "../../components/dish-option";
 import { DISH_FRAGMENT, RESTAURANT_FRAGMENT } from "../../fragments";
 import { useMe } from "../../hooks/useMe";
+import {
+  createOrder,
+  createOrderVariables,
+} from "../../__generated__/createOrder";
 import {
   CreateOrderItemInput,
   UserRole,
@@ -36,6 +40,7 @@ const CREATE_ORDER_MUTATION = gql`
     createOrder(input: $input) {
       ok
       error
+      orderId
     }
   }
 `;
@@ -45,6 +50,33 @@ interface IRestaurantParams {
 }
 
 export const RestaurantScreen: React.FC = () => {
+  const navigate = useNavigate();
+  const onCompleted = (data: createOrder) => {
+    const {
+      createOrder: { ok, orderId },
+    } = data;
+    window.confirm("주문이 완료되었습니다.");
+    if (ok) {
+      navigate(`/orders/${orderId}`);
+    }
+  };
+  const [createOrder, { loading }] = useMutation<
+    createOrder,
+    createOrderVariables
+  >(CREATE_ORDER_MUTATION, { onCompleted });
+  const onSubmit = () => {
+    if (loading) {
+      return;
+    }
+    createOrder({
+      variables: {
+        input: {
+          restaurantId: +params.id,
+          items: orderItems,
+        },
+      },
+    });
+  };
   const { data: userData } = useMe();
   const [isCustomer] = useState(userData?.me.role === UserRole.Client);
   const params = useParams() as IRestaurantParams;
@@ -63,20 +95,15 @@ export const RestaurantScreen: React.FC = () => {
   };
   const getItem = (dishId: number) =>
     orderItems.find((order) => order.dishId === dishId);
-  // 주문 리스트에 음식이 현재 추가되어 있는지 확인
   const isSelected = (dishId: number) => Boolean(getItem(dishId));
-  // 주문할 음식
   const addOrderItem = (dishId: number) => {
     if (isSelected(dishId)) {
       return;
     }
     setOrderItems((prev) => [{ dishId, options: [] }, ...prev]);
   };
-  // 취소할 음식
   const removeOrderItem = (dishId: number) =>
     setOrderItems(orderItems.filter((item) => item.dishId !== dishId));
-  // 추가로 선택할 수 있는 옵션이 있는 음식의 경우, 옵션을 추가
-
   useEffect(() => {
     console.log(orderItems);
   }, [orderItems]);
@@ -101,12 +128,29 @@ export const RestaurantScreen: React.FC = () => {
 
       <div className="max-w-4xl mx-auto mt-10">
         <div className="pb-10">
-          <span
-            onClick={startOrder}
-            className="text-white bg-green-500 py-4 px-8 cursor-pointer"
-          >
-            {`${orderStarted ? "Ordering" : "Start Order"}`}
-          </span>
+          {orderStarted ? (
+            <>
+              <span
+                onClick={onSubmit}
+                className="text-white bg-rose-500 py-4 px-8 cursor-pointer"
+              >
+                Finish
+              </span>
+              <span
+                onClick={startOrder}
+                className="text-rose-500 py-4 px-8 cursor-pointer"
+              >
+                Cancel
+              </span>
+            </>
+          ) : (
+            <span
+              onClick={startOrder}
+              className="text-white bg-green-500 py-4 px-8 cursor-pointer"
+            >
+              Start Order
+            </span>
+          )}
         </div>
         {data?.restaurant.restaurant?.menu.length === 0 ? (
           <div className="text-sm text-gray-500">

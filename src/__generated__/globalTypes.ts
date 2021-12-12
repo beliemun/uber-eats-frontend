@@ -76,6 +76,7 @@ export interface MyRestaurantInput {
 
 export interface OrderItemOptionInputType {
   name: string;
+  extra?: number | null;
   choice?: string | null;
 }
 

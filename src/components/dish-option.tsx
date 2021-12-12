@@ -3,11 +3,10 @@ import {
   CreateOrderItemInput,
   OrderItemOptionInputType,
 } from "../__generated__/globalTypes";
-import { restaurant_restaurant_restaurant_menu_options } from "../__generated__/restaurant";
 
 interface IDishOptionProps {
   dishId: number;
-  option: restaurant_restaurant_restaurant_menu_options;
+  option: OrderItemOptionInputType;
   getItem: (dishId: number) => CreateOrderItemInput | undefined;
   isSelected: (dishId: number) => boolean;
   setOrderItems: React.Dispatch<React.SetStateAction<CreateOrderItemInput[]>>;
@@ -47,11 +46,15 @@ export const DishOption: React.FC<IDishOptionProps> = ({
         removeOrderItem(dishId);
         // 새로운 옵션을 추가하여 새로운 주문으로 추가
         setOrderItems((prev) => [
-          { dishId, options: [option, ...oldItem.options!] },
+          {
+            dishId,
+            options: [
+              { name: option.name, extra: option.extra },
+              ...oldItem.options!,
+            ],
+          },
           ...prev,
         ]);
-      } else {
-        window.alert("같은 옵션이 이미 추가되어 있습니다.");
       }
     }
   };
