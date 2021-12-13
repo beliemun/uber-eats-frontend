@@ -1,11 +1,12 @@
-import { useQuery } from "@apollo/client";
+import { useQuery, useSubscription } from "@apollo/client";
 import gql from "graphql-tag";
-import React from "react";
-import { useParams } from "react-router";
+import React, { useEffect } from "react";
+import { useNavigate, useParams } from "react-router";
 import { Link } from "react-router-dom";
 import { Dish } from "../../components/dish";
 import {
   DISH_FRAGMENT,
+  FULL_ORDER_FRAGMENT,
   ORDER_FRAGMENT,
   RESTAURANT_FRAGMENT,
 } from "../../fragments";
@@ -21,6 +22,7 @@ import {
   VictoryTheme,
   VictoryVoronoiContainer,
 } from "victory";
+import { pendingOrder } from "../../__generated__/pendingOrder";
 
 export const MY_RESTAURANT_QUERY = gql`
   query myRestaurant($input: MyRestaurantInput!) {
@@ -43,11 +45,29 @@ export const MY_RESTAURANT_QUERY = gql`
   ${ORDER_FRAGMENT}
 `;
 
+const PENDING_ORDER_SUBSCRIPTION = gql`
+  subscription pendingOrder {
+    pendingOrder {
+      ...FullOrderFragment
+    }
+  }
+  ${FULL_ORDER_FRAGMENT}
+`;
+
 interface IParams {
   id: string;
 }
 
 export const MyRestaurant: React.FC = () => {
+  const navigate = useNavigate();
+  const { data: subscriptionData } = useSubscription<pendingOrder>(
+    PENDING_ORDER_SUBSCRIPTION
+  );
+  useEffect(() => {
+    if (subscriptionData?.pendingOrder.id) {
+      navigate(`/orders/${subscriptionData.pendingOrder.id}`);
+    }
+  }, [subscriptionData, navigate]);
   const { id } = useParams() as IParams;
   const { data } = useQuery<myRestaurant, myRestaurantVariables>(
     MY_RESTAURANT_QUERY,
@@ -111,7 +131,7 @@ export const MyRestaurant: React.FC = () => {
           containerComponent={<VictoryVoronoiContainer />}
         >
           <VictoryLine
-            labels={({ datum }) => `${datum.y}원`}
+            labels={({ datum }) => datum.y}
             labelComponent={
               // renderInPortal 내부 컴포넌트로 넣어서 안짤리게 보이게 할 때 사용
               <VictoryLabel style={{ fontSize: 20 }} renderInPortal dy={-15} />

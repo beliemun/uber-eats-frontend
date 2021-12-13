@@ -1,10 +1,17 @@
-import { useQuery, useSubscription } from "@apollo/client";
+import { useMutation, useQuery, useSubscription } from "@apollo/client";
 import gql from "graphql-tag";
 import React, { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useParams } from "react-router";
 import { FULL_ORDER_FRAGMENT } from "../../fragments";
+import { useMe } from "../../hooks/useMe";
+import { editOrder, editOrderVariables } from "../../__generated__/editOrder";
 import { getOrder, getOrderVariables } from "../../__generated__/getOrder";
+import {
+  EditOrderInput,
+  OrderStatus,
+  UserRole,
+} from "../../__generated__/globalTypes";
 import {
   orderUpdates,
   orderUpdatesVariables,
@@ -32,11 +39,23 @@ const ORDER_SUBSCRIPTION = gql`
   ${FULL_ORDER_FRAGMENT}
 `;
 
+const EDIT_ORDER_MUTATION = gql`
+  mutation editOrder($input: EditOrderInput!) {
+    editOrder(input: $input) {
+      ok
+      error
+    }
+  }
+`;
+
 interface IParams {
   id: string;
 }
 
 export const Order: React.FC = () => {
+  const [eidtOrderMutation, { loading: editOrderMutationLoading }] =
+    useMutation<editOrder, editOrderVariables>(EDIT_ORDER_MUTATION);
+  const { data: userData } = useMe();
   const params = useParams() as IParams;
   const { data, loading, subscribeToMore } = useQuery<
     getOrder,
@@ -70,11 +89,24 @@ export const Order: React.FC = () => {
         },
       });
     }
-  }, [data]);
+  }, [data, params.id, subscribeToMore]);
   const { data: subscriptionData } = useSubscription<
     orderUpdates,
     orderUpdatesVariables
   >(ORDER_SUBSCRIPTION, { variables: { input: { id: +params.id } } });
+  const onChangeOrderState = (status: OrderStatus) => {
+    if (editOrderMutationLoading) {
+      return;
+    }
+    eidtOrderMutation({
+      variables: {
+        input: {
+          id: +params.id,
+          status,
+        },
+      },
+    });
+  };
   return !loading || !data ? (
     <div className="flex justify-center pt-20">
       <Helmet>
@@ -108,7 +140,37 @@ export const Order: React.FC = () => {
                 : "Not yet"}
             </span>
           </h4>
-          <h3 className="py-4 text-center text-xl text-rose-500">{`Status: ${data?.getOrder.order?.status}`}</h3>
+          {userData?.me.role === UserRole.Client && (
+            <h3 className="py-4 text-center text-xl text-rose-500">
+              {`Status: ${data?.getOrder.order?.status}`}
+            </h3>
+          )}
+          {userData?.me.role === UserRole.Owner && (
+            <>
+              {data?.getOrder.order?.status === OrderStatus.Pending && (
+                <button
+                  onClick={() => onChangeOrderState(OrderStatus.Cooking)}
+                  className="button w-full my-4"
+                >
+                  Accept Order
+                </button>
+              )}
+              {data?.getOrder.order?.status === OrderStatus.Cooking && (
+                <button
+                  onClick={() => onChangeOrderState(OrderStatus.Cooked)}
+                  className="button w-full my-4"
+                >
+                  Call Driver
+                </button>
+              )}
+              {data?.getOrder.order?.status !== OrderStatus.Pending &&
+                data?.getOrder.order?.status !== OrderStatus.Cooking && (
+                  <h3 className="py-4 text-center text-xl text-rose-500">
+                    {`Status: ${data?.getOrder.order?.status}`}
+                  </h3>
+                )}
+            </>
+          )}
         </div>
       </div>
     </div>
