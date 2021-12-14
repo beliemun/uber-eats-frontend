@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useSubscription } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import gql from "graphql-tag";
 import React, { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
@@ -7,15 +7,8 @@ import { FULL_ORDER_FRAGMENT } from "../../fragments";
 import { useMe } from "../../hooks/useMe";
 import { editOrder, editOrderVariables } from "../../__generated__/editOrder";
 import { getOrder, getOrderVariables } from "../../__generated__/getOrder";
-import {
-  EditOrderInput,
-  OrderStatus,
-  UserRole,
-} from "../../__generated__/globalTypes";
-import {
-  orderUpdates,
-  orderUpdatesVariables,
-} from "../../__generated__/orderUpdates";
+import { OrderStatus, UserRole } from "../../__generated__/globalTypes";
+import { orderUpdates } from "../../__generated__/orderUpdates";
 
 const GET_ORDER_QUERY = gql`
   query getOrder($input: GetOrderInput!) {
@@ -90,10 +83,10 @@ export const Order: React.FC = () => {
       });
     }
   }, [data, params.id, subscribeToMore]);
-  const { data: subscriptionData } = useSubscription<
-    orderUpdates,
-    orderUpdatesVariables
-  >(ORDER_SUBSCRIPTION, { variables: { input: { id: +params.id } } });
+  // const { data: subscriptionData } = useSubscription<
+  //   orderUpdates,
+  //   orderUpdatesVariables
+  // >(ORDER_SUBSCRIPTION, { variables: { input: { id: +params.id } } });
   const onChangeOrderState = (status: OrderStatus) => {
     if (editOrderMutationLoading) {
       return;
@@ -107,6 +100,10 @@ export const Order: React.FC = () => {
       },
     });
   };
+  // useEffect(() => {
+  //   console.log("subscriptionData:");
+  //   console.log(subscriptionData);
+  // }, [subscriptionData]);
   return !loading || !data ? (
     <div className="flex justify-center pt-20">
       <Helmet>

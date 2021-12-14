@@ -16,6 +16,7 @@ import { AddRestaurant } from "../routes/owner/add-restaurant";
 import { MyRestaurant } from "../routes/owner/my-restaurant";
 import { AddDish } from "../routes/owner/add-dish";
 import { Order } from "../routes/user/order";
+import { Dashboard } from "../routes/driver/dashboard";
 
 const renderCommonRoutes = () => (
   <>
@@ -44,6 +45,12 @@ const renderOwnerRoutes = () => (
   </>
 );
 
+const renderDriverRoutes = () => (
+  <>
+    <Route path="/" element={<Dashboard />} />
+  </>
+);
+
 export const Auth: React.FC = () => {
   const { data, loading, error } = useMe();
 
@@ -57,6 +64,7 @@ export const Auth: React.FC = () => {
         {renderCommonRoutes()}
         {data?.me.role === UserRole.Client && renderClientRoutes()}
         {data?.me.role === UserRole.Owner && renderOwnerRoutes()}
+        {data?.me.role === UserRole.Delivery && renderDriverRoutes()}
       </Routes>
     </>
   );
