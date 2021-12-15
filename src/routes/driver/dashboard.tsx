@@ -1,6 +1,30 @@
 import React, { useEffect, useState } from "react";
 import GoogleMapReact from "google-map-react";
 import { Helmet } from "react-helmet-async";
+import gql from "graphql-tag";
+import { FULL_ORDER_FRAGMENT } from "../../fragments";
+import { useMutation, useSubscription } from "@apollo/client";
+import { cookedOrder } from "../../__generated__/cookedOrder";
+import { Link } from "react-router-dom";
+import { takeOrder, takeOrderVariables } from "../../__generated__/takeOrder";
+
+const COOCKED_ORDER_SUBSCRIPTION = gql`
+  subscription cookedOrder {
+    cookedOrder {
+      ...FullOrderFragment
+    }
+  }
+  ${FULL_ORDER_FRAGMENT}
+`;
+
+const TAKE_ORDER_MUTATION = gql`
+  mutation takeOrder($input: TakeOrderInput!) {
+    takeOrder(input: $input) {
+      ok
+      error
+    }
+  }
+`;
 
 interface ICoords {
   lat: number;
@@ -20,9 +44,14 @@ const Driver: React.FC<IDriverProps> = () => (
 );
 
 export const Dashboard: React.FC = () => {
+  const [takeOrderMutation, { loading: takeOrderMutationLoading }] =
+    useMutation<takeOrder, takeOrderVariables>(TAKE_ORDER_MUTATION);
+  const { data: subscriptionData } = useSubscription<cookedOrder>(
+    COOCKED_ORDER_SUBSCRIPTION
+  );
   const [driverCoords, setDriverCoords] = useState<ICoords>({
-    lat: 0,
-    lng: 0,
+    lat: 51.5,
+    lng: -0.15,
   });
   const [map, setMap] = useState<google.maps.Map>();
   // maps는 브라우저가 로딩될 때 window에 이미 포함된다.
@@ -47,22 +76,34 @@ export const Dashboard: React.FC = () => {
       enableHighAccuracy: true,
     });
   }, []);
-  useEffect(() => {
-    if (map) {
-      map.panTo(new google.maps.LatLng(driverCoords.lat, driverCoords.lng));
-      const geocoder = new google.maps.Geocoder();
-      geocoder.geocode(
-        {
-          location: new google.maps.LatLng(driverCoords.lat, driverCoords.lng),
-        },
-        (result, status) => {
-          console.log(status, result);
-        }
-      );
+  // useEffect(() => {
+  //   if (map) {
+  //     map.panTo(new google.maps.LatLng(driverCoords.lat, driverCoords.lng));
+  //     const geocoder = new google.maps.Geocoder();
+  //     geocoder.geocode(
+  //       {
+  //         location: new google.maps.LatLng(driverCoords.lat, driverCoords.lng),
+  //       },
+  //       (result, status) => {
+  //         console.log(status, result);
+  //       }
+  //     );
+  //   }
+  // }, [driverCoords.lat, driverCoords.lng, map]);
+  const onTakeOrder = () => {
+    if (takeOrderMutationLoading || !subscriptionData) {
+      return;
     }
-  }, [driverCoords.lat, driverCoords.lng]);
-  const onGetRouteClick = () => {
-    if (map) {
+    takeOrderMutation({
+      variables: {
+        input: {
+          id: subscriptionData.cookedOrder.id,
+        },
+      },
+    });
+  };
+  useEffect(() => {
+    if (subscriptionData?.cookedOrder.id && map) {
       const directionsService = new google.maps.DirectionsService();
       const directionRenderer = new google.maps.DirectionsRenderer();
       directionRenderer.setMap(map);
@@ -78,7 +119,7 @@ export const Dashboard: React.FC = () => {
           destination: {
             location: new google.maps.LatLng(
               driverCoords.lat + 0.05,
-              driverCoords.lng + 0.05
+              driverCoords.lng
             ),
           },
         },
@@ -87,12 +128,13 @@ export const Dashboard: React.FC = () => {
         }
       );
     }
-  };
+  }, [subscriptionData, driverCoords, map]);
+
   return (
-    <>
+    <div className="bg-white" style={{ height: "85vh" }}>
       <div
-        className="overflow-hidden"
-        style={{ width: window.innerWidth, height: "50vh" }}
+        className="overflow-hidden "
+        style={{ width: window.innerWidth, height: "40vh" }}
       >
         <Helmet>
           <title>Dashboard | Uber Eats</title>
@@ -110,7 +152,32 @@ export const Dashboard: React.FC = () => {
           <Driver lat={driverCoords.lat} lng={driverCoords.lng} />
         </GoogleMapReact>
       </div>
-      <button onClick={onGetRouteClick}>Get route</button>
-    </>
+
+      <div className="flex justify-center pt-20 ">
+        {subscriptionData?.cookedOrder ? (
+          <div className="w-full max-w-md border border-green-500 ">
+            <h2 className="bg-green-500 font-medium text-white text-center text-xl py-4">
+              New Cooked Order
+            </h2>
+            <h4 className="py-4 border-t border-gray-200 text-center">
+              {`Pick it up soon at ${subscriptionData?.cookedOrder.restaurant?.name}`}
+            </h4>
+            <Link
+              to={`/orders/${subscriptionData.cookedOrder.id}`}
+              className="button flex justify-center"
+              onClick={onTakeOrder}
+            >
+              Accept &rarr;
+            </Link>
+          </div>
+        ) : (
+          <div className="w-full max-w-md ">
+            <h2 className="text-gray-400 font-medium text-center text-2xl">
+              No orders yet..
+            </h2>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };

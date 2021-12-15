@@ -55,7 +55,6 @@ export const RestaurantScreen: React.FC = () => {
     const {
       createOrder: { ok, orderId },
     } = data;
-    window.confirm("주문이 완료되었습니다.");
     if (ok) {
       navigate(`/orders/${orderId}`);
     }

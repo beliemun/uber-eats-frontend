@@ -114,6 +114,10 @@ export interface SeeRestaurantsInput {
   page?: number | null;
 }
 
+export interface TakeOrderInput {
+  id: number;
+}
+
 export interface VerifyEmailInput {
   code: string;
 }

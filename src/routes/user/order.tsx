@@ -46,7 +46,7 @@ interface IParams {
 }
 
 export const Order: React.FC = () => {
-  const [eidtOrderMutation, { loading: editOrderMutationLoading }] =
+  const [editOrderMutation, { loading: editOrderMutationLoading }] =
     useMutation<editOrder, editOrderVariables>(EDIT_ORDER_MUTATION);
   const { data: userData } = useMe();
   const params = useParams() as IParams;
@@ -91,7 +91,7 @@ export const Order: React.FC = () => {
     if (editOrderMutationLoading) {
       return;
     }
-    eidtOrderMutation({
+    editOrderMutation({
       variables: {
         input: {
           id: +params.id,
@@ -167,6 +167,23 @@ export const Order: React.FC = () => {
                   </h3>
                 )}
             </>
+          )}
+          {userData?.me.role === UserRole.Delivery && (
+            <>
+              {data?.getOrder.order?.status === OrderStatus.PickedUp && (
+                <button
+                  onClick={() => onChangeOrderState(OrderStatus.Delivered)}
+                  className="button w-full my-4"
+                >
+                  Delivered
+                </button>
+              )}
+            </>
+          )}
+          {data?.getOrder.order?.status === OrderStatus.Delivered && (
+            <h3 className="py-4 text-center text-xl text-green-500">
+              {`Thank you for using Uber eats!`}
+            </h3>
           )}
         </div>
       </div>
