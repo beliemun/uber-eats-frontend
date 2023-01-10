@@ -2,22 +2,22 @@
 
 Uber Eats Clone Frontend
 
-"NodeJS"
-"NestJS"
-"Typescript"
-"TypeORM"
-"GraphQL"
-"Mailgun"
-"React"
-"Victory"
-"Tailwind"
-"Apollo"
-"Jest"
-"Cypress"
-"React Testing Library"
-"Netlify"
-"PostgreSQL"
-"Heroku"
+NodeJS,
+NestJS,
+Typescript,
+TypeORM,
+GraphQL,
+Mailgun,
+React,
+Victory,
+Tailwind,
+Apollo,
+Jest,
+Cypress,
+React Testing Library,
+Netlify,
+PostgreSQL,
+Heroku
 
 ## Users:
 
